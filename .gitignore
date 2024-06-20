@@ -2,5 +2,6 @@
 /debug
 .cargo-ok
 .DS_Store
+.env
 
 Cargo.lock
