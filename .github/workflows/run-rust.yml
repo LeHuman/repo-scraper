@@ -24,6 +24,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: cargo run --release --bin repo-scraper -- --output ./public
+      - uses: prantlf/delete-cache-action@v2
+        with:
+          key: cache-bin-data
       - uses: actions/cache/save@v4
         if: always()
         with:
