@@ -7,6 +7,7 @@ use std::{cmp::Ordering, collections::HashMap};
 #[derive(Eq, PartialEq, Encode, Decode, Default, SetField)]
 pub struct RepoDetails {
     pub project: Option<String>,
+    pub main: Option<String>, // NOTE: Special option that defines this repo as the main for it's project, it's value does not matter but it should have a value
     pub title: Option<String>,
     pub font: Option<Vec<String>>,
     pub color: Option<Vec<u32>>,
@@ -18,9 +19,9 @@ pub struct RepoDetails {
 }
 
 impl RepoDetails {
-    fn new() -> RepoDetails {
-        RepoDetails::default()
-    }
+    // fn new() -> RepoDetails {
+    //     RepoDetails::default()
+    // }
 
     fn set(&mut self, key: &String, val: &String) -> bool {
         // IMPROVE: attempt to 'cast' directly to type, instead of just trial and error, will need custom macro or just use serde
@@ -60,7 +61,7 @@ impl RepoDetails {
     }
 }
 
-#[derive(Eq, Encode, Decode)]
+#[derive(Eq, Encode, Decode, Default)]
 pub struct Repo {
     pub uid: String,
     pub id: String,

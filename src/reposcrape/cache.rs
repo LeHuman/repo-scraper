@@ -1,4 +1,5 @@
 use std::collections::BTreeSet;
+use std::fs;
 use std::io::{Read, Write};
 
 use bincode::{enc::write::Writer, Decode, Encode};
@@ -6,6 +7,7 @@ use flate2::bufread::ZlibDecoder;
 use flate2::write::ZlibEncoder;
 use flate2::Compression;
 
+use super::expand::ExpandedCache;
 use super::repo::Repo;
 
 struct BinIO<'a> {
@@ -37,17 +39,29 @@ impl Writer for BinIO<'_> {
     }
 }
 
-#[derive(Eq, PartialEq, Encode, Decode)]
-pub struct BinCache {
-    pub(crate) repos: BTreeSet<Repo>,
+#[derive(Eq, PartialEq, Encode, Decode, Default)]
+pub struct Cache {
+    pub repos: BTreeSet<Repo>,
 }
 
-impl BinCache {
-    pub fn new(repos: BTreeSet<Repo>) -> BinCache {
-        BinCache { repos: repos }
+impl Cache {
+    pub fn _new(repos: BTreeSet<Repo>) -> Cache {
+        Cache { repos: repos }
     }
 
-    pub fn load(compressed_bytes: &[u8]) -> Result<BinCache, bincode::error::DecodeError> {
+    pub fn append(&mut self, other: &mut BTreeSet<Repo>) {
+        self.repos.append(other);
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.repos.len() == 0
+    }
+
+    pub fn expand(&self) -> ExpandedCache {
+        ExpandedCache::new(self)
+    }
+
+    pub fn _load(compressed_bytes: &[u8]) -> Result<Cache, bincode::error::DecodeError> {
         let config = bincode::config::standard();
         let decompressed = BinIO::decompress(compressed_bytes);
 
@@ -56,11 +70,11 @@ impl BinCache {
         }
 
         let bytes = decompressed.expect("Failed to load decompressed bytes");
-        let (cache, _len): (BinCache, usize) = bincode::decode_from_slice(&bytes[..], config)?;
+        let (cache, _len): (Cache, usize) = bincode::decode_from_slice(&bytes[..], config)?;
         return Ok(cache);
     }
 
-    pub fn dump(&self) -> Result<Vec<u8>, bincode::error::EncodeError> {
+    pub fn _dump(&self) -> Result<Vec<u8>, bincode::error::EncodeError> {
         let config = bincode::config::standard();
         let mut encoder: ZlibEncoder<Vec<u8>> = ZlibEncoder::new(Vec::new(), Compression::best());
         let io = BinIO::new(&mut encoder);
@@ -75,9 +89,21 @@ impl BinCache {
 
         return Ok(compressed_bytes.expect("Failed to load compressed bytes"));
     }
-}
 
-// pub struct ExpandedCache {
-//     pub(crate) repos: BTreeMap<String, Repo>,
-//     pub(crate) projects: BTreeMap<String, ProjectEntry>,
-// }
+    pub fn load(cache_file: &str) -> Cache {
+        let mut file = match fs::File::open(cache_file) {
+            Ok(file) => file,
+            Err(_) => return Cache::default(),
+        };
+
+        let mut buf = Vec::new();
+        if file.read_to_end(&mut buf).is_err() {
+            return Cache::default();
+        }
+
+        match Cache::_load(&buf) {
+            Ok(cache) => cache,
+            Err(_) => Cache::default(),
+        }
+    }
+}

@@ -1,11 +1,12 @@
 use std::collections::BTreeSet;
 
 use crate::reposcrape::{
+    cache::Cache,
+    expand::ExpandedCache,
     repo::{Repo, RepoDetails},
-    store::BinCache,
 };
 
-pub fn test_bincache_encode_decode() -> Result<(), Box<dyn std::error::Error>> {
+pub fn test_expand_cache() -> Result<(), Box<dyn std::error::Error>> {
     let mut repos: BTreeSet<Repo> = BTreeSet::new();
     repos.insert(Repo {
         uid: "github/Username/Repo0".into(),
@@ -24,6 +25,7 @@ pub fn test_bincache_encode_decode() -> Result<(), Box<dyn std::error::Error>> {
             languages: Some(Vec::from(["rust".into(), "C++".into()])),
             technology: Some(Vec::from(["GH Actions".into(), "https".into()])),
             status: Some("Work In Progress".into()),
+            main: Some("".into()),
         }),
     });
     repos.insert(Repo {
@@ -43,6 +45,7 @@ pub fn test_bincache_encode_decode() -> Result<(), Box<dyn std::error::Error>> {
             languages: Some(Vec::from(["C++".into()])),
             technology: Some(Vec::from(["https".into()])),
             status: Some("Archive".into()),
+            main: Some("this".into()),
         }),
     });
     repos.insert(Repo {
@@ -62,16 +65,17 @@ pub fn test_bincache_encode_decode() -> Result<(), Box<dyn std::error::Error>> {
             languages: Some(Vec::from(["C".into()])),
             technology: Some(Vec::from(["tech2".into()])),
             status: Some("Work In Progress".into()),
+            main: None,
         }),
     });
 
-    let dummy_load_start = BinCache::new(repos);
+    let dummy_cache = Cache::_new(repos);
 
-    let dump = dummy_load_start.dump()?;
+    let expanded_cache = ExpandedCache::new(&dummy_cache);
 
-    let dummy_load_end = BinCache::load(&dump)?;
-
-    assert!(dummy_load_end == dummy_load_start);
+    assert!(expanded_cache.repos.len() == 3);
+    assert!(expanded_cache.projects.len() == 1);
+    assert!(expanded_cache.single_repos.len() == 1);
 
     Ok(())
 }
