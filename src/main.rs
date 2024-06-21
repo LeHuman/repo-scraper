@@ -1,7 +1,7 @@
 use clap::{arg, command, Parser};
-use std::fs;
 use std::io::Write;
 use std::path::Path;
+use std::{env, fs};
 
 /// Simple program to generate a static index.html file at a specified path
 #[derive(Parser, Debug)]
@@ -19,6 +19,9 @@ fn main() {
     // Define the directory and file paths
     let out_dir = &args.output;
     let index_path = format!("{}/index.html", out_dir);
+
+    // Use the GitHub token
+    let _github_token = env::var("GITHUB_TOKEN").expect("No GitHub token in env");
 
     // Create the directory if it doesn't exist
     if !Path::new(out_dir).exists() {
