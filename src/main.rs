@@ -1,5 +1,6 @@
 use clap::{arg, command, Parser};
 use rand::Rng;
+use std::fs::OpenOptions;
 use std::io::Write;
 use std::path::Path;
 use std::{env, fs};
@@ -64,9 +65,13 @@ fn main() {
     // Check if the file already exists
     if Path::new(file_path).exists() {
         println!("File already exists: {file_path}");
-        let mut file = fs::File::open(file_path).expect("Failed to open output.txt file");
+        let mut file = OpenOptions::new()
+            .append(true)
+            .open(file_path)
+            .expect("Failed to open output.txt file");
         let mut rng = rand::thread_rng();
-        file.write_all(rng.gen::<u32>().to_string().as_bytes())
+        let random_number = rng.gen::<u32>().to_string();
+        file.write_all(random_number.as_bytes())
             .expect("Failed to write to file");
     } else {
         // Create and write to the file
