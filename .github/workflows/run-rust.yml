@@ -15,9 +15,17 @@ jobs:
     steps: # Each job consists in a series of steps
       - name: Checkout # Clone git repository
         uses: actions/checkout@v4
+      - name: Cache bin data
+        id: cache-bin
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-bin-data
+        with:
+          path: ./.cache
+          key: ${{ env.cache-name }}
       - name: Install stable toolchain
         uses: dtolnay/rust-toolchain@stable
-      - name: Build the static site
+      - name: Build rust app and run # TODO: use published docker instead of building app
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: cargo run --release --bin repo-scraper -- --output ./public

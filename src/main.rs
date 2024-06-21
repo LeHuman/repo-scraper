@@ -18,7 +18,7 @@ fn main() {
 
     // Define the directory and file paths
     let out_dir = &args.output;
-    let index_path = format!("{}/index.html", out_dir);
+    let index_path = &format!("{}/index.html", out_dir);
 
     // Use the GitHub token
     let _github_token = env::var("GITHUB_TOKEN").expect("No GitHub token in env");
@@ -45,9 +45,29 @@ fn main() {
     "#;
 
     // Write the content to the index.html file
-    let mut file = fs::File::create(&index_path).expect("Failed to create index.html file");
+    let mut file = fs::File::create(index_path).expect("Failed to create index.html file");
     file.write_all(html_content.as_bytes())
         .expect("Failed to write to index.html file");
 
     println!("Static site generated successfully at {}", index_path);
+
+    // Define the directory and file paths
+    let dir_path = "./.cache";
+    let file_path = &format!("{}/output.txt", dir_path);
+
+    // Check if the directory exists, and create it if it doesn't
+    if !Path::new(dir_path).exists() {
+        fs::create_dir(dir_path).expect("Failed to create .cache directory");
+    }
+
+    // Check if the file already exists
+    if Path::new(file_path).exists() {
+        println!("File already exists: {file_path}");
+    } else {
+        // Create and write to the file
+        let mut file = fs::File::create(file_path).expect("Failed to create output.txt file");
+        file.write_all(b"Hello, this is a sample text.")
+            .expect("Failed to write to file");
+        println!("File written to {file_path}");
+    }
 }
