@@ -1,0 +1,23 @@
+name: Run Rust
+on:
+  # Run on any PR
+  workflow_dispatch:
+jobs:
+  check: # Any action can contain multiple jobs
+    runs-on: ubuntu-latest # OS on which the job runs
+    steps: # Each job consists in a series of steps
+      - name: Checkout # Clone git repository
+        uses: actions/checkout@v3
+      - name: Install stable toolchain
+        uses: dtolnay/rust-toolchain@stable
+    #   - name: Check that code can compile
+    #     run: cargo check # Run the `cargo check` command
+      - name: Build the static site
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: cargo run --release --bin repo-scraper -- --output /page
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: /page
