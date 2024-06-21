@@ -2,6 +2,8 @@ name: Run Rust
 on:
   # Run on any PR
   workflow_dispatch:
+permissions:
+  contents: write
 jobs:
   check: # Any action can contain multiple jobs
     runs-on: ubuntu-latest # OS on which the job runs
