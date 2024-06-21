@@ -26,7 +26,6 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          name: page-artifact
           path: './public' # Upload static site
       - name: Deploy to GitHub Pages
         id: deployment
@@ -34,4 +33,4 @@ jobs:
       - name: Delete artifact
         uses: geekyeggo/delete-artifact@v5
         with:
-          name: page-artifact
+          name: github-pages
