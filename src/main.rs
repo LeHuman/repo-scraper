@@ -1,15 +1,28 @@
+use clap::{arg, command, Parser};
 use std::fs;
 use std::io::Write;
 use std::path::Path;
 
+/// Simple program to generate a static index.html file at a specified path
+#[derive(Parser, Debug)]
+#[command(author, version, about, long_about = None)]
+struct Args {
+    /// Output path for the generated static site
+    #[arg(short, long)]
+    output: String,
+}
+
 fn main() {
+    // Parse the command-line arguments
+    let args = Args::parse();
+
     // Define the directory and file paths
-    let out_dir = "page";
+    let out_dir = &args.output;
     let index_path = format!("{}/index.html", out_dir);
 
     // Create the directory if it doesn't exist
     if !Path::new(out_dir).exists() {
-        fs::create_dir(out_dir).expect("Failed to create output directory");
+        fs::create_dir_all(out_dir).expect("Failed to create output directory");
     }
 
     // Define the content for the index.html

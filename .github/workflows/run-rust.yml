@@ -1,0 +1,40 @@
+name: Run Rust
+on:
+  # Run on any PR
+  workflow_dispatch:
+jobs:
+  check: # Any action can contain multiple jobs
+    runs-on: ubuntu-latest # OS on which the job runs
+    steps: # Each job consists in a series of steps
+      - name: Checkout # Clone git repository
+        uses: actions/checkout@v3
+      - name: Install stable toolchain
+        uses: dtolnay/rust-toolchain@stable
+      - name: Check that code can compile
+        run: cargo check # Run the `cargo check` command
+      - name: Build the static site
+        run: cargo run --release --bin repo-scraper -- --output /page
+      - name: Setup Git
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+      - name: Create or checkout blank branch
+        run: |
+          BRANCH="rust-page"
+          if git show-ref --verify --quiet refs/heads/$BRANCH; then
+              git checkout $BRANCH
+          else
+              git checkout --orphan $BRANCH
+          fi
+      - name: Clean existing files
+        run: |-
+          rm -rf *
+          rm -rf .[^.]*  # Remove dotfiles except for `..` and `.`
+          git clean -fdx  # Force remove untracked files
+      - name: Copy generated site to the branch
+        run: cp -r /page* .
+      - name: Commit and push changes
+        run: |
+          git add .
+          git commit -m "Deploy static site"
+          git push --force origin blank-branch
