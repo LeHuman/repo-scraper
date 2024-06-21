@@ -14,27 +14,8 @@ jobs:
         run: cargo check # Run the `cargo check` command
       - name: Build the static site
         run: cargo run --release --bin repo-scraper -- --output /page
-      - name: Setup Git
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-      - name: Create or checkout blank branch
-        run: |
-          BRANCH="rust-page"
-          if git show-ref --verify --quiet refs/heads/$BRANCH; then
-              git checkout $BRANCH
-          else
-              git checkout --orphan $BRANCH
-          fi
-      - name: Clean existing files
-        run: |-
-          rm -rf *
-          rm -rf .[^.]*  # Remove dotfiles except for `..` and `.`
-          git clean -fdx  # Force remove untracked files
-      - name: Copy generated site to the branch
-        run: cp -r /page* .
-      - name: Commit and push changes
-        run: |
-          git add .
-          git commit -m "Deploy static site"
-          git push --force origin blank-branch
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: /page
