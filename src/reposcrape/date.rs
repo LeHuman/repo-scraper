@@ -1,9 +1,10 @@
 use chrono::{DateTime, ParseError, Utc};
 
-pub type EpochType = u64;
+pub type EpochType = u128;
 
 pub struct Epoch;
 
+// TODO: Is all this casting with epoch fine?
 impl Epoch {
     pub fn to_rfc3339(epoch: EpochType) -> Option<String> {
         let datetime = DateTime::from_timestamp_millis(epoch as i64);
@@ -19,6 +20,6 @@ impl Epoch {
         std::time::UNIX_EPOCH
             .elapsed()
             .expect("Failed to get epoch time")
-            .as_secs()
+            .as_millis()
     }
 }
