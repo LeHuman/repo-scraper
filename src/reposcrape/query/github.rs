@@ -1,9 +1,9 @@
 use std::collections::BTreeSet;
 
-use chrono::{DateTime, Utc};
 use octocrab::Octocrab;
 
-use crate::reposcrape::Date;
+use crate::reposcrape::date::EpochType;
+use crate::reposcrape::Epoch;
 use crate::reposcrape::{repo::Repo, Metadata};
 
 use super::query::{QueryInterface, QueryResult};
@@ -31,6 +31,7 @@ impl GHQuery {
                 nodes {{
                     id
                     name
+                    updatedAt
                     owner{{login}}
                     object(expression: "HEAD:README.md") {{
                         ... on Blob {{
@@ -44,8 +45,14 @@ impl GHQuery {
         )
     }
 
-    fn qstr_dated(username: &str, max_count: u32, after_date: DateTime<Utc>) -> String {
-        let local_date = Date::to_date_str(after_date);
+    fn qstr_dated(username: &str, max_count: u32, after_epoch: EpochType) -> String {
+        let local_date = match Epoch::to_rfc3339(after_epoch) {
+            Some(s) => s,
+            None => {
+                println!("Failed to parse rfc3339 from epoch, defaulting to zero");
+                "1970-01-01T00:00:00Z".to_owned()
+            }
+        };
         format!(
             r#"query {{
     search(type: REPOSITORY, first: {max_count}, query: "user:{username} pushed:>{local_date}") {{
@@ -53,6 +60,7 @@ impl GHQuery {
         ... on Repository {{
             id
             name
+            updatedAt
             owner{{login}}
             object(expression: "HEAD:README.md") {{
             ... on Blob {{
@@ -68,10 +76,18 @@ impl GHQuery {
 
     async fn process_response_node(
         repo_val: &serde_json::Value,
-        today_str: &String,
+        today_epoch: EpochType,
     ) -> Option<Repo> {
         let id = repo_val["id"].as_str()?.to_owned();
-        let name = repo_val["name"].as_str()?.to_owned();
+        let name: String = repo_val["name"].as_str()?.to_owned();
+        let updated_at = repo_val["updatedAt"].as_str()?.to_owned();
+        let updated_at = match Epoch::from_rfc3339(&updated_at) {
+            Ok(e) => e,
+            Err(_) => {
+                println!("Failed to parse repo update time");
+                0
+            }
+        };
         let owner = repo_val["owner"].as_object()?["login"].as_str()?.to_owned();
         let readme_text = repo_val["object"].as_object()?["text"].as_str()?; // NOTE: fn ignores repositories with no README.md
         let metadata = Metadata::extract(readme_text);
@@ -80,7 +96,8 @@ impl GHQuery {
             name,
             owner,
             ORIGIN.to_owned(),
-            today_str.to_owned(),
+            today_epoch,
+            updated_at,
             &metadata,
         ))
     }
@@ -125,12 +142,12 @@ impl GHQuery {
             }
         };
 
-        let now_str = Date::get_local_date_str();
+        let now_epoch = Epoch::get_local();
 
         let mut node_process = Vec::new();
 
         for repo_node in response_nodes {
-            node_process.push(Self::process_response_node(repo_node, &now_str));
+            node_process.push(Self::process_response_node(repo_node, now_epoch));
         }
 
         let mut result: BTreeSet<Repo> = BTreeSet::new();
@@ -152,14 +169,11 @@ impl QueryInterface for GHQuery {
             .await
     }
 
-    async fn fetch_after(
-        &self,
-        user: &str,
-        max_count: u32,
-        after_date: DateTime<Utc>,
-    ) -> QueryResult {
+    async fn fetch_after(&self, user: &str, max_count: u32, after_epoch: EpochType) -> QueryResult {
         self.call_query(&Self::form_qstr(Self::qstr_dated(
-            user, max_count, after_date,
+            user,
+            max_count,
+            after_epoch,
         )))
         .await
     }

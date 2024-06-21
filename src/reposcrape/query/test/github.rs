@@ -4,7 +4,7 @@ use secrecy::SecretString;
 
 use crate::reposcrape::{
     query::{github::GHQuery, query::QueryInterface},
-    Date,
+    Epoch,
 };
 
 pub async fn test_github_retrieve() -> Result<(), Box<dyn std::error::Error>> {
@@ -13,12 +13,12 @@ pub async fn test_github_retrieve() -> Result<(), Box<dyn std::error::Error>> {
     let octocrab = Octocrab::builder().personal_token(personal_token).build()?;
     let query = GHQuery::new(octocrab);
 
-    let _latest = query.fetch_latest("LeHuman", 4).await?;
+    let _latest = query.fetch_latest("LeHuman", 8).await?;
     let _dated = query
         .fetch_after(
             "LeHuman",
             4,
-            Date::from_date_str("2021-05-15")?,
+            Epoch::from_rfc3339("2022-05-14T19:19:26Z")?,
         )
         .await?;
 

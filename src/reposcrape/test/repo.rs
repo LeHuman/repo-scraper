@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::reposcrape::repo::Repo;
+use crate::reposcrape::{repo::Repo, Epoch};
 
 pub fn test_repo_create() -> Result<(), Box<dyn std::error::Error>> {
     let mut metadata: HashMap<String, String> = HashMap::new();
@@ -10,7 +10,8 @@ pub fn test_repo_create() -> Result<(), Box<dyn std::error::Error>> {
         "bru".into(),
         "oof".into(),
         "okay".into(),
-        "today".into(),
+        Epoch::from_rfc3339("2019-06-14T08:19:26Z")?,
+        Epoch::from_rfc3339("2019-06-14T08:19:26Z")?,
         &metadata,
     );
 
@@ -31,7 +32,8 @@ pub fn test_repo_create() -> Result<(), Box<dyn std::error::Error>> {
         "".into(),
         "".into(),
         "".into(),
-        "".into(),
+        Epoch::from_rfc3339("2021-06-14T08:19:26Z")?,
+        Epoch::from_rfc3339("2021-06-14T08:19:26Z")?,
         &metadata,
     );
 
@@ -52,7 +54,8 @@ pub fn test_repo_create() -> Result<(), Box<dyn std::error::Error>> {
         "35".into(),
         "atw".into(),
         "gadd".into(),
-        "😎😎".into(),
+        Epoch::from_rfc3339("2020-06-14T08:19:26Z")?,
+        Epoch::from_rfc3339("2020-06-14T08:19:26Z")?,
         &metadata,
     );
 

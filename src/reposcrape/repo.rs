@@ -2,6 +2,8 @@ use bincode::{Decode, Encode};
 use set_field::SetField;
 use std::{cmp::Ordering, collections::HashMap};
 
+use super::date::EpochType;
+
 // TODO: map details to color codes if possible, look into phf crate for static maps
 
 #[derive(Eq, PartialEq, Encode, Decode, Default, SetField, Clone, Debug)]
@@ -19,10 +21,6 @@ pub struct RepoDetails {
 }
 
 impl RepoDetails {
-    // fn new() -> RepoDetails {
-    //     RepoDetails::default()
-    // }
-
     fn set(&mut self, key: &String, val: &String) -> bool {
         // IMPROVE: attempt to 'cast' directly to type, instead of just trial and error, will need custom macro or just use serde
         let nkey = key.to_lowercase();
@@ -68,13 +66,21 @@ pub struct Repo {
     pub name: String,
     pub owner: String,
     pub origin: String,
-    pub last_update: String, // IMPROVE: use an actual Datetime object, at least during runtime
+    pub last_sync: EpochType,
+    pub last_update: EpochType,
     pub details: Option<RepoDetails>,
 }
 
+// TODO: Ensure comparing date strings works
 impl Ord for Repo {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.last_update.cmp(&other.last_update)
+        if self == other {
+            return self.last_sync.cmp(&other.last_sync);
+        } else {
+            self.last_update
+                .cmp(&other.last_update)
+                .then(self.uid.cmp(&other.uid))
+        }
     }
 }
 
@@ -96,7 +102,8 @@ impl Repo {
         name: String,
         owner: String,
         origin: String,
-        last_update: String,
+        last_sync: EpochType,
+        last_update: EpochType,
         metadata: &HashMap<String, String>,
     ) -> Repo {
         let mut details = RepoDetails::default();
@@ -117,6 +124,7 @@ impl Repo {
             name: name,
             owner: owner,
             origin: origin,
+            last_sync: last_sync,
             last_update: last_update,
             details: if update { Some(details) } else { None },
         }

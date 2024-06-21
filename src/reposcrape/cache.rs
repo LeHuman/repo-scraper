@@ -7,9 +7,10 @@ use flate2::bufread::ZlibDecoder;
 use flate2::write::ZlibEncoder;
 use flate2::Compression;
 
+use super::date::EpochType;
 use super::expand::ExpandedCache;
 use super::repo::Repo;
-use super::Date;
+use super::Epoch;
 
 struct BinIO<'a> {
     encoder: &'a mut ZlibEncoder<Vec<u8>>,
@@ -43,14 +44,14 @@ impl Writer for BinIO<'_> {
 #[derive(Eq, PartialEq, Encode, Decode, Default)]
 pub struct Cache {
     pub repos: BTreeSet<Repo>,
-    pub last_update: String,
+    pub last_update: EpochType,
 }
 
 impl Cache {
     pub fn new(repos: BTreeSet<Repo>) -> Cache {
         Cache {
             repos: repos,
-            last_update: Date::get_local_date_str(),
+            last_update: Epoch::get_local(),
         }
     }
 
@@ -130,6 +131,6 @@ impl Cache {
         let mut repos = repos.clone();
         repos.extend(self.repos.clone());
         self.repos = repos;
-        self.last_update = Date::get_local_date_str();
+        self.last_update = Epoch::get_local();
     }
 }

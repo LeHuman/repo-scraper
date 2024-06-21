@@ -4,6 +4,7 @@ use crate::reposcrape::{
     cache::Cache,
     expand::ExpandedCache,
     repo::{Repo, RepoDetails},
+    Epoch,
 };
 
 pub fn test_expand_cache() -> Result<(), Box<dyn std::error::Error>> {
@@ -14,7 +15,8 @@ pub fn test_expand_cache() -> Result<(), Box<dyn std::error::Error>> {
         name: "Repo0".into(),
         owner: "Username0".into(),
         origin: "github".into(),
-        last_update: "2018-04-06".into(),
+        last_sync: Epoch::from_rfc3339("2019-05-14T19:19:26Z")?,
+        last_update: Epoch::from_rfc3339("2018-05-14T19:19:26Z")?,
         details: Some(RepoDetails {
             project: Some("Project0".into()),
             title: Some("Repo0-0".into()),
@@ -34,7 +36,8 @@ pub fn test_expand_cache() -> Result<(), Box<dyn std::error::Error>> {
         name: "Repo1".into(),
         owner: "Username1".into(),
         origin: "github".into(),
-        last_update: "2020-08-07".into(),
+        last_sync: Epoch::from_rfc3339("2021-06-14T08:19:26Z")?,
+        last_update: Epoch::from_rfc3339("2020-05-14T08:19:26Z")?,
         details: Some(RepoDetails {
             project: Some("Project0".into()),
             title: Some("Repo1-0".into()),
@@ -54,7 +57,8 @@ pub fn test_expand_cache() -> Result<(), Box<dyn std::error::Error>> {
         name: "Repo2".into(),
         owner: "Username0".into(),
         origin: "github".into(),
-        last_update: "2020-07-02".into(),
+        last_sync: Epoch::from_rfc3339("2021-06-14T08:19:26Z")?,
+        last_update: Epoch::from_rfc3339("2020-10-12T08:19:26Z")?,
         details: Some(RepoDetails {
             project: Some("Project1".into()),
             title: Some("Repo2-1".into()),

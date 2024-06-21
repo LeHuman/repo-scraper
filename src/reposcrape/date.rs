@@ -1,28 +1,24 @@
-use chrono::{DateTime, Datelike, NaiveDate, NaiveDateTime, NaiveTime, ParseError, TimeZone, Utc};
+use chrono::{DateTime, ParseError, Utc};
 
-pub struct Date;
+pub type EpochType = u64;
 
-impl Date {
-    pub fn from_date_str(date_str: &str) -> Result<DateTime<Utc>, ParseError> {
-        let naive_date = NaiveDate::parse_from_str(date_str, "%Y-%m-%d")?;
-        let naive_time = match NaiveTime::from_hms_opt(0, 0, 0) {
-            Some(time) => time,
-            None => {
-                // TODO: Is there a better way to throw ParseError?
-                NaiveDate::parse_from_str("break", "break")?;
-                return Ok(Utc::now());
-            }
-        };
-        let naive_datetime = NaiveDateTime::new(naive_date, naive_time);
-        let utc = Utc::from_utc_datetime(&Utc, &naive_datetime);
-        Ok(utc)
+pub struct Epoch;
+
+impl Epoch {
+    pub fn to_rfc3339(epoch: EpochType) -> Option<String> {
+        let datetime = DateTime::from_timestamp_millis(epoch as i64);
+        Some(datetime?.to_rfc3339())
     }
 
-    pub fn to_date_str(time: DateTime<Utc>) -> String {
-        format!("{:04}-{:02}-{:02}", time.year(), time.month(), time.day())
+    pub fn from_rfc3339(date_str: &str) -> Result<EpochType, ParseError> {
+        let datetime = DateTime::parse_from_rfc3339(date_str)?.with_timezone(&Utc);
+        Ok(datetime.timestamp_millis() as EpochType)
     }
 
-    pub fn get_local_date_str() -> String {
-        Self::to_date_str(Utc::now())
+    pub fn get_local() -> EpochType {
+        std::time::UNIX_EPOCH
+            .elapsed()
+            .expect("Failed to get epoch time")
+            .as_secs()
     }
 }
