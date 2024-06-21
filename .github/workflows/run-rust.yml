@@ -27,6 +27,7 @@ jobs:
       - uses: prantlf/delete-cache-action@v2
         with:
           key: cache-bin-data
+          token: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/cache/save@v4
         if: always()
         with:
