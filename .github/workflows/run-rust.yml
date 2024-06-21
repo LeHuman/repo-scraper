@@ -1,6 +1,7 @@
 name: Run Rust
 on:
-  # Run on any PR
+  schedule:
+    - cron: '0 0 */14 * *' # Runs every two weeks
   workflow_dispatch:
 permissions:
   contents: read
@@ -11,9 +12,9 @@ concurrency:
   group: "pages"
   cancel-in-progress: false
 jobs:
-  check: # Any action can contain multiple jobs
-    runs-on: ubuntu-latest # OS on which the job runs
-    steps: # Each job consists in a series of steps
+  check:
+    runs-on: ubuntu-latest
+    steps:
       - uses: actions/checkout@v4
       - uses: actions/cache/restore@v4
         with:
@@ -38,7 +39,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './public' # Upload static site
+          path: './public'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
