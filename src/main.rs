@@ -3,7 +3,6 @@ use std::fs;
 use std::io::Write;
 use std::path::Path;
 
-use clap::{arg, command, Parser};
 use octocrab::Octocrab;
 use rand::Rng;
 
@@ -14,20 +13,9 @@ use reposcrape::{
 };
 mod reposcrape;
 
-#[derive(Parser, Debug)]
-#[command(author, version, about, long_about = None)]
-struct Args {
-    /// Output path for the generated static site
-    #[arg(short, long)]
-    output: String,
-}
-
 fn html_test() {
-    // Parse the command-line arguments
-    let args = Args::parse();
-
     // Define the directory and file paths
-    let out_dir = &args.output;
+    let out_dir = "./public";
     let index_path = &format!("{}/index.html", out_dir);
 
     // Use the GitHub token
@@ -60,15 +48,10 @@ fn html_test() {
         .expect("Failed to write to index.html file");
 
     println!("Static site generated successfully at {}", index_path);
+}
 
-    // Define the directory and file paths
-    let dir_path = "./.cache";
-    let file_path = &format!("{}/output.txt", dir_path);
-
-    // Check if the directory exists, and create it if it doesn't
-    if !Path::new(dir_path).exists() {
-        fs::create_dir(dir_path).expect("Failed to create .cache directory");
-    }
+fn cache_test() {
+    let file_path = "./.cache";
 
     // Check if the file already exists
     if Path::new(file_path).exists() {
