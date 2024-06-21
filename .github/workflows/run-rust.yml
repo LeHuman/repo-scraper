@@ -13,22 +13,22 @@ jobs:
   check: # Any action can contain multiple jobs
     runs-on: ubuntu-latest # OS on which the job runs
     steps: # Each job consists in a series of steps
-      - name: Checkout # Clone git repository
-        uses: actions/checkout@v4
-      - name: Cache bin data
-        id: cache-bin
-        uses: actions/cache@v4
-        env:
-          cache-name: cache-bin-data
+      - uses: actions/checkout@v4
+      - uses: actions/cache/restore@v4
         with:
           path: ./.cache
-          key: ${{ env.cache-name }}
+          key: cache-bin-data
       - name: Install stable toolchain
         uses: dtolnay/rust-toolchain@stable
       - name: Build rust app and run # TODO: use published docker instead of building app
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: cargo run --release --bin repo-scraper -- --output ./public
+      - uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: ./.cache
+          key: cache-bin-data
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
