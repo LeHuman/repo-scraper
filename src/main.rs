@@ -4,7 +4,6 @@ use std::io::Write;
 use std::path::Path;
 
 use octocrab::Octocrab;
-use rand::Rng;
 
 use reposcrape::{
     cache::Cache,
@@ -50,28 +49,26 @@ fn html_test() {
     println!("Static site generated successfully at {}", index_path);
 }
 
-fn cache_test() {
-    let file_path = "./.cache";
+// fn cache_test() {
+//     let file_path = "./.cache";
 
-    // Check if the file already exists
-    if Path::new(file_path).exists() {
-        println!("File already exists: {file_path}");
-        let mut file = fs::OpenOptions::new()
-            .append(true)
-            .open(file_path)
-            .expect("Failed to open .cache file");
-        let mut rng = rand::thread_rng();
-        let random_number = rng.gen::<u32>().to_string();
-        file.write_all(random_number.as_bytes())
-            .expect("Failed to write to file");
-    } else {
-        // Create and write to the file
-        let mut file = fs::File::create(file_path).expect("Failed to create .cache file");
-        file.write_all(b"Hello, this is a sample text.")
-            .expect("Failed to write to file");
-        println!("File written to {file_path}");
-    }
-}
+//     // Check if the file already exists
+//     if Path::new(file_path).exists() {
+//         println!("File already exists: {file_path}");
+//         let mut file = fs::OpenOptions::new()
+//             .append(true)
+//             .open(file_path)
+//             .expect("Failed to open .cache file");
+//         file.write_all("hello".as_bytes())
+//             .expect("Failed to write to file");
+//     } else {
+//         // Create and write to the file
+//         let mut file = fs::File::create(file_path).expect("Failed to create .cache file");
+//         file.write_all(b"Hello, this is a sample text.")
+//             .expect("Failed to write to file");
+//         println!("File written to {file_path}");
+//     }
+// }
 
 async fn example(cache_file: &str) -> Result<(), Box<dyn std::error::Error>> {
     let mut cache = Cache::load(cache_file);

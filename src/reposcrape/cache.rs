@@ -8,7 +8,7 @@ use flate2::write::ZlibEncoder;
 use flate2::Compression;
 
 use super::date::EpochType;
-use super::expand::ExpandedCache;
+// use super::expand::ExpandedCache;
 use super::repo::Repo;
 use super::Epoch;
 
@@ -55,17 +55,17 @@ impl Cache {
         }
     }
 
-    pub fn append(&mut self, other: &mut BTreeSet<Repo>) {
-        self.repos.append(other);
-    }
+    // pub fn append(&mut self, other: &mut BTreeSet<Repo>) {
+    //     self.repos.append(other);
+    // }
 
     pub fn is_empty(&self) -> bool {
         self.repos.len() == 0
     }
 
-    pub fn expand(&self) -> ExpandedCache {
-        ExpandedCache::new(self)
-    }
+    // pub fn expand(&self) -> ExpandedCache {
+    //     ExpandedCache::new(self)
+    // }
 
     pub fn _load(compressed_bytes: &[u8]) -> Result<Cache, bincode::error::DecodeError> {
         let config = bincode::config::standard();
