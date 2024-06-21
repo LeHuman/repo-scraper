@@ -69,13 +69,10 @@ impl Cache {
 
     pub fn _load(compressed_bytes: &[u8]) -> Result<Cache, bincode::error::DecodeError> {
         let config = bincode::config::standard();
-        let decompressed = BinIO::decompress(compressed_bytes);
-
-        if decompressed.is_err() {
-            return Err(bincode::error::DecodeError::Other("Failed to decompress"));
-        }
-
-        let bytes = decompressed.expect("Failed to load decompressed bytes");
+        let bytes = match BinIO::decompress(compressed_bytes) {
+            Ok(d) => d,
+            Err(_) => return Err(bincode::error::DecodeError::Other("Failed to decompress")),
+        };
         let (cache, _len): (Cache, usize) = bincode::decode_from_slice(&bytes[..], config)?;
         return Ok(cache);
     }
