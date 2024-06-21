@@ -2,7 +2,7 @@ use super::repo::Repo;
 
 use std::collections::BTreeSet;
 
-#[derive(Eq, PartialEq)]
+#[derive(Eq, PartialEq, Debug)]
 pub struct Project<'p> {
     pub name: &'p String,
     pub description: Option<&'p String>,

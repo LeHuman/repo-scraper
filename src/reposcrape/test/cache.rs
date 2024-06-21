@@ -68,7 +68,7 @@ pub fn test_cache_encode_decode() -> Result<(), Box<dyn std::error::Error>> {
         }),
     });
 
-    let dummy_load_start = Cache::_new(repos);
+    let dummy_load_start = Cache::new(repos);
 
     let dump = dummy_load_start._dump()?;
 

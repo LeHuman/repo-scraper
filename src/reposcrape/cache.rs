@@ -1,6 +1,6 @@
 use std::collections::BTreeSet;
-use std::fs;
 use std::io::{Read, Write};
+use std::{fs, io};
 
 use bincode::{enc::write::Writer, Decode, Encode};
 use flate2::bufread::ZlibDecoder;
@@ -9,6 +9,7 @@ use flate2::Compression;
 
 use super::expand::ExpandedCache;
 use super::repo::Repo;
+use super::Date;
 
 struct BinIO<'a> {
     encoder: &'a mut ZlibEncoder<Vec<u8>>,
@@ -42,11 +43,15 @@ impl Writer for BinIO<'_> {
 #[derive(Eq, PartialEq, Encode, Decode, Default)]
 pub struct Cache {
     pub repos: BTreeSet<Repo>,
+    pub last_update: String,
 }
 
 impl Cache {
-    pub fn _new(repos: BTreeSet<Repo>) -> Cache {
-        Cache { repos: repos }
+    pub fn new(repos: BTreeSet<Repo>) -> Cache {
+        Cache {
+            repos: repos,
+            last_update: Date::get_local_date_str(),
+        }
     }
 
     pub fn append(&mut self, other: &mut BTreeSet<Repo>) {
@@ -90,6 +95,19 @@ impl Cache {
         return Ok(compressed_bytes.expect("Failed to load compressed bytes"));
     }
 
+    pub fn save(&self, cache_file: &str) -> io::Result<()> {
+        let bin = match self._dump() {
+            Ok(b) => b,
+            Err(_) => {
+                return Err(std::io::Error::new(
+                    io::ErrorKind::InvalidInput,
+                    "bin dump failed",
+                ))
+            }
+        };
+        fs::write(cache_file, bin)
+    }
+
     pub fn load(cache_file: &str) -> Cache {
         let mut file = match fs::File::open(cache_file) {
             Ok(file) => file,
@@ -105,5 +123,13 @@ impl Cache {
             Ok(cache) => cache,
             Err(_) => Cache::default(),
         }
+    }
+
+    pub fn update(&mut self, repos: &BTreeSet<Repo>) {
+        // TODO: Test if extending on incoming repos changes anything or if persistance depends on Ord impl
+        let mut repos = repos.clone();
+        repos.extend(self.repos.clone());
+        self.repos = repos;
+        self.last_update = Date::get_local_date_str();
     }
 }

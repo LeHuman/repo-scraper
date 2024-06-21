@@ -1,7 +1,7 @@
 use super::{cache::Cache, project::Project, repo::Repo};
 use std::collections::{BTreeMap, BTreeSet};
 
-#[derive(Eq, PartialEq, Default)]
+#[derive(Eq, PartialEq, Default, Debug)]
 pub struct ExpandedCache<'c> {
     pub repos: BTreeMap<&'c String, &'c Repo>,
     pub single_repos: BTreeSet<&'c Repo>,

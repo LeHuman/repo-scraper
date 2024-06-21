@@ -4,7 +4,7 @@ use std::{cmp::Ordering, collections::HashMap};
 
 // TODO: map details to color codes if possible, look into phf crate for static maps
 
-#[derive(Eq, PartialEq, Encode, Decode, Default, SetField)]
+#[derive(Eq, PartialEq, Encode, Decode, Default, SetField, Clone, Debug)]
 pub struct RepoDetails {
     pub project: Option<String>,
     pub main: Option<String>, // NOTE: Special option that defines this repo as the main for it's project, it's value does not matter but it should have a value
@@ -61,14 +61,14 @@ impl RepoDetails {
     }
 }
 
-#[derive(Eq, Encode, Decode, Default)]
+#[derive(Eq, Encode, Decode, Default, Clone, Debug)]
 pub struct Repo {
     pub uid: String,
     pub id: String,
     pub name: String,
     pub owner: String,
     pub origin: String,
-    pub last_update: String,
+    pub last_update: String, // IMPROVE: use an actual Datetime object, at least during runtime
     pub details: Option<RepoDetails>,
 }
 

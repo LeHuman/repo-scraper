@@ -69,7 +69,7 @@ pub fn test_expand_cache() -> Result<(), Box<dyn std::error::Error>> {
         }),
     });
 
-    let dummy_cache = Cache::_new(repos);
+    let dummy_cache = Cache::new(repos);
 
     let expanded_cache = ExpandedCache::new(&dummy_cache);
 
