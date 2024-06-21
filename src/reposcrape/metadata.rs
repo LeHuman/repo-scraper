@@ -5,7 +5,7 @@ pub struct Metadata;
 
 impl Metadata {
     pub fn extract(text: &str) -> HashMap<String, String> {
-        let re: Regex = Regex::new(r"(?i)^\s*<!--\s*((?P<key>.*?):\s*(?P<val>.*?)|(?P<start>\w+\s*START)|(?P<end>\w+\s*END))\s*-\s*-\s*>").unwrap();
+        let re: Regex = Regex::new(r"(?i)^\s*<!--\s*((?P<key>\w*?):\s*(?P<val>.*?)|(?P<start>\w+\s*START)|(?P<end>\w+\s*END))\s*-\s*-\s*>").unwrap();
         let re_section: Regex = Regex::new(r"(?i)^(?P<name>.+?)\s*?(START|END)").unwrap();
         let mut map: HashMap<String, String> = HashMap::new();
 
