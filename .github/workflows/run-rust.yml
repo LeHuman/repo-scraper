@@ -3,7 +3,12 @@ on:
   # Run on any PR
   workflow_dispatch:
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 jobs:
   check: # Any action can contain multiple jobs
     runs-on: ubuntu-latest # OS on which the job runs
