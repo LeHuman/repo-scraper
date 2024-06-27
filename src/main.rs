@@ -10,6 +10,7 @@ use reposcrape::{
     expand::ExpandedCache,
     query::{github::GHQuery, query::QueryInterface},
 };
+mod color;
 mod reposcrape;
 
 fn html_test() {
@@ -47,6 +48,17 @@ fn html_test() {
         .expect("Failed to write to index.html file");
 
     println!("Static site generated successfully at {}", index_path);
+}
+
+async fn color_test() {
+    match color::fetch_language_colors().await {
+        Ok(language_colors) => {
+            for (lang, color) in language_colors {
+                println!("{}: {}", lang, color);
+            }
+        }
+        Err(e) => eprintln!("Error fetching language colors: {}", e),
+    }
 }
 
 // fn cache_test() {
@@ -94,6 +106,7 @@ async fn example(cache_file: &str) -> Result<(), Box<dyn std::error::Error>> {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    color_test().await;
     reposcrape::test::repo::test_repo_create()?;
     reposcrape::test::cache::test_cache_encode_decode()?;
     reposcrape::test::expand::test_expand_cache()?;
