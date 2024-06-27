@@ -8,6 +8,8 @@ pub use repo::RepoDetails;
 mod project;
 pub use project::Project;
 
+pub mod cache;
+
 pub mod query;
 
 pub mod test;

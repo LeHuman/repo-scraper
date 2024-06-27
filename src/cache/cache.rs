@@ -1,4 +1,3 @@
-use std::collections::{BTreeSet, HashMap};
 use std::io::{Read, Write};
 use std::{fs, io};
 
@@ -8,7 +7,6 @@ use flate2::write::ZlibEncoder;
 use flate2::Compression;
 
 use crate::date::{Epoch, EpochType};
-use crate::reposcrape::Repo;
 
 struct BinIO<'a> {
     encoder: &'a mut ZlibEncoder<Vec<u8>>,
@@ -50,7 +48,7 @@ pub struct Cachable<T> {
     pub last_update: EpochType,
 }
 
-impl<T: Clone> Cachable<T> {
+impl<T> Cachable<T> {
     pub fn is_outdated(&self) -> bool {
         let local = Epoch::get_local();
         let millis = (self.days_to_update * 24 * 60 * 60 * 100).into();
@@ -58,56 +56,26 @@ impl<T: Clone> Cachable<T> {
     }
 }
 
-impl Update<BTreeSet<Repo>> for Cachable<BTreeSet<Repo>> {
-    fn update(&mut self, other: &BTreeSet<Repo>) {
-        // TODO: Test if extending on incoming repos changes anything or if persistance depends on Ord impl
-        let mut other = other.clone();
-        other.extend(self.data.clone());
-        self.data = other;
-        self.last_update = Epoch::get_local();
-    }
-}
+pub trait Cache {
+    fn is_empty(&self) -> bool;
 
-impl Update<HashMap<String, String>> for Cachable<HashMap<String, String>> {
-    fn update(&mut self, other: &HashMap<String, String>) {
-        let mut other = other.to_owned();
-        other.extend(self.data.clone());
-        self.data = other;
-    }
-}
-
-#[derive(Eq, PartialEq, Encode, Decode, Default)]
-pub struct Cache {
-    pub repos: Cachable<BTreeSet<Repo>>,
-    pub colors: Cachable<HashMap<String, String>>,
-}
-
-impl Cache {
-    pub fn new(
-        repos: Option<Cachable<BTreeSet<Repo>>>,
-        colors: Option<Cachable<HashMap<String, String>>>,
-    ) -> Cache {
-        Cache {
-            repos: repos.unwrap_or_default(),
-            colors: colors.unwrap_or_default(),
-        }
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.repos.data.len() == 0
-    }
-
-    pub fn _load(compressed_bytes: &[u8]) -> Result<Cache, bincode::error::DecodeError> {
+    fn _load(compressed_bytes: &[u8]) -> Result<Self, bincode::error::DecodeError>
+    where
+        Self: Eq + PartialEq + Encode + Decode + Default,
+    {
         let config = bincode::config::standard();
         let bytes = match BinIO::decompress(compressed_bytes) {
             Ok(d) => d,
             Err(_) => return Err(bincode::error::DecodeError::Other("Failed to decompress")),
         };
-        let (cache, _len): (Cache, usize) = bincode::decode_from_slice(&bytes[..], config)?;
+        let (cache, _len): (Self, usize) = bincode::decode_from_slice(&bytes[..], config)?;
         return Ok(cache);
     }
 
-    pub fn _dump(&self) -> Result<Vec<u8>, bincode::error::EncodeError> {
+    fn _dump(&self) -> Result<Vec<u8>, bincode::error::EncodeError>
+    where
+        Self: Eq + PartialEq + Encode + Decode + Default,
+    {
         let config = bincode::config::standard();
         let mut encoder: ZlibEncoder<Vec<u8>> = ZlibEncoder::new(Vec::new(), Compression::best());
         let io = BinIO::new(&mut encoder);
@@ -123,7 +91,10 @@ impl Cache {
         return Ok(compressed_bytes.expect("Failed to load compressed bytes"));
     }
 
-    pub fn save(&self, cache_file: &str) -> io::Result<()> {
+    fn save(&self, cache_file: &str) -> io::Result<()>
+    where
+        Self: Eq + PartialEq + Encode + Decode + Default,
+    {
         let bin = match self._dump() {
             Ok(b) => b,
             Err(_) => {
@@ -136,20 +107,23 @@ impl Cache {
         fs::write(cache_file, bin)
     }
 
-    pub fn load(cache_file: &str) -> Cache {
+    fn load(cache_file: &str) -> Self
+    where
+        Self: Eq + PartialEq + Encode + Decode + Default,
+    {
         let mut file = match fs::File::open(cache_file) {
             Ok(file) => file,
-            Err(_) => return Cache::default(),
+            Err(_) => return Self::default(),
         };
 
         let mut buf = Vec::new();
         if file.read_to_end(&mut buf).is_err() {
-            return Cache::default();
+            return Self::default();
         }
 
-        match Cache::_load(&buf) {
+        match Self::_load(&buf) {
             Ok(cache) => cache,
-            Err(_) => Cache::default(),
+            Err(_) => Self::default(),
         }
     }
 }

@@ -7,7 +7,8 @@ use cache::Cache;
 use cache::Update;
 use octocrab::Octocrab;
 
-use cache::ExpandedRepoCache;
+use reposcrape::cache::ExpandedRepoCache;
+use reposcrape::cache::RepoScrapeCache;
 use reposcrape::query::{github::GHQuery, query::QueryInterface};
 
 mod cache;
@@ -85,7 +86,7 @@ async fn color_test() {
 // }
 
 async fn example(cache_file: &str) -> Result<(), Box<dyn std::error::Error>> {
-    let mut cache = Cache::load(cache_file);
+    let mut cache = RepoScrapeCache::load(cache_file);
 
     if cache.is_empty() || cache.repos.is_outdated() {
         let colors = color::fetch_language_colors().await;
@@ -95,7 +96,7 @@ async fn example(cache_file: &str) -> Result<(), Box<dyn std::error::Error>> {
             .build()?;
         let query = GHQuery::new(octocrab);
 
-        let fetched = query.fetch_latest("LeHuman", 8).await?;
+        let fetched = query.fetch_latest("LeHuman", 64).await?;
 
         cache.repos.update(&fetched);
         if let Ok(colors) = colors {
@@ -117,9 +118,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     color_test().await;
     reposcrape::test::repo::test_repo_create()?;
     cache::test::cache::test_cache_encode_decode()?;
-    cache::test::expand_repo::test_expand_cache()?;
-    reposcrape::query::test::github::test_github_retrieve().await?;
+    reposcrape::cache::test::expand_repo::test_expand_cache()?;
+    // reposcrape::query::test::github::test_github_retrieve().await?;
     example("./.cache").await?;
-    html_test();
+    // html_test();
     Ok(())
 }

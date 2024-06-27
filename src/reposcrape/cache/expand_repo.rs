@@ -5,6 +5,8 @@ use crate::{
     reposcrape::{Project, Repo},
 };
 
+use super::cache::RepoScrapeCache;
+
 #[derive(Eq, PartialEq, Default, Debug)]
 pub struct ExpandedRepoCache<'c> {
     pub repos: BTreeMap<&'c String, &'c Repo>,
@@ -13,7 +15,7 @@ pub struct ExpandedRepoCache<'c> {
 }
 
 impl<'c> ExpandedRepoCache<'c> {
-    pub fn new(cache: &'c Cache) -> ExpandedRepoCache<'c> {
+    pub fn new(cache: &'c RepoScrapeCache) -> ExpandedRepoCache<'c> {
         let mut expanded = ExpandedRepoCache::default();
 
         if cache.is_empty() {
