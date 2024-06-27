@@ -1,7 +1,7 @@
 use std::collections::BTreeSet;
 
 use crate::{
-    cache::{Cache, ExpandedCache},
+    cache::{Cachable, Cache, ExpandedRepoCache},
     date::Epoch,
     reposcrape::{Repo, RepoDetails},
 };
@@ -72,9 +72,16 @@ pub fn test_expand_cache() -> Result<(), Box<dyn std::error::Error>> {
         }),
     });
 
-    let dummy_cache = Cache::new(Some(repos), None);
+    let dummy_cache = Cache::new(
+        Some(Cachable {
+            data: repos,
+            days_to_update: 0,
+            last_update: 0,
+        }),
+        None,
+    );
 
-    let expanded_cache = ExpandedCache::new(&dummy_cache);
+    let expanded_cache = ExpandedRepoCache::new(&dummy_cache);
 
     assert!(expanded_cache.repos.len() == 3);
     assert!(expanded_cache.projects.len() == 1);

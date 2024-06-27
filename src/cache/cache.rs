@@ -1,3 +1,4 @@
+use std::any::Any;
 use std::collections::{BTreeSet, HashMap};
 use std::io::{Read, Write};
 use std::{fs, io};
@@ -39,39 +40,63 @@ impl Writer for BinIO<'_> {
     }
 }
 
+pub trait Update<T> {
+    fn update(&mut self, other: &T);
+}
+
+#[derive(Eq, PartialEq, Encode, Decode, Default)]
+pub struct Cachable<T> {
+    pub data: T,
+    pub days_to_update: u32,
+    pub last_update: EpochType,
+}
+
+impl<T: Clone> Cachable<T> {
+    pub fn is_outdated(&self) -> bool {
+        let local = Epoch::get_local();
+        let millis = (self.days_to_update * 24 * 60 * 60 * 100).into();
+        (self.last_update < local) && (local - self.last_update > millis)
+    }
+}
+
+impl Update<BTreeSet<Repo>> for Cachable<BTreeSet<Repo>> {
+    fn update(&mut self, other: &BTreeSet<Repo>) {
+        // TODO: Test if extending on incoming repos changes anything or if persistance depends on Ord impl
+        let mut other = other.clone();
+        other.extend(self.data.clone());
+        self.data = other;
+        self.last_update = Epoch::get_local();
+    }
+}
+
+impl Update<HashMap<String, String>> for Cachable<HashMap<String, String>> {
+    fn update(&mut self, other: &HashMap<String, String>) {
+        let mut other = other.to_owned();
+        other.extend(self.data.clone());
+        self.data = other;
+    }
+}
+
 #[derive(Eq, PartialEq, Encode, Decode, Default)]
 pub struct Cache {
-    pub repos: BTreeSet<Repo>,
-    pub last_update: EpochType,
-    pub colors: HashMap<String, String>,
+    pub repos: Cachable<BTreeSet<Repo>>,
+    pub colors: Cachable<HashMap<String, String>>,
 }
 
 impl Cache {
-    pub fn new(repos: Option<BTreeSet<Repo>>, colors: Option<HashMap<String, String>>) -> Cache {
+    pub fn new(
+        repos: Option<Cachable<BTreeSet<Repo>>>,
+        colors: Option<Cachable<HashMap<String, String>>>,
+    ) -> Cache {
         Cache {
             repos: repos.unwrap_or_default(),
-            last_update: Epoch::get_local(),
             colors: colors.unwrap_or_default(),
         }
     }
 
-    // pub fn append(&mut self, other: &mut BTreeSet<Repo>) {
-    //     self.repos.append(other);
-    // }
-
     pub fn is_empty(&self) -> bool {
-        self.repos.len() == 0
+        self.repos.data.len() == 0
     }
-
-    pub fn days_old(&self, days: u32) -> bool {
-        let local = Epoch::get_local();
-        let millis = (days * 24 * 60 * 60 * 100).into();
-        (self.last_update < local) && (local - self.last_update > millis)
-    }
-
-    // pub fn expand(&self) -> ExpandedCache {
-    //     ExpandedCache::new(self)
-    // }
 
     pub fn _load(compressed_bytes: &[u8]) -> Result<Cache, bincode::error::DecodeError> {
         let config = bincode::config::standard();
@@ -128,27 +153,4 @@ impl Cache {
             Err(_) => Cache::default(),
         }
     }
-
-    pub fn update_repos(&mut self, repos: &BTreeSet<Repo>) {
-        // TODO: Test if extending on incoming repos changes anything or if persistance depends on Ord impl
-        let mut repos = repos.clone();
-        repos.extend(self.repos.clone());
-        self.repos = repos;
-        self.last_update = Epoch::get_local();
-    }
-
-    pub fn update_colors(&mut self, colors: &HashMap<String, String>) {
-        let mut colors = colors.to_owned();
-        colors.extend(self.colors.clone());
-        self.colors = colors;
-    }
-
-    // pub fn update(&mut self, other: &Cache) {
-    //     if !other.repos.is_empty() {
-    //         self.update_repos(&other.repos);
-    //     }
-    //     if !other.colors.is_empty() {
-    //         self.update_colors(&other.colors);
-    //     }
-    // }
 }

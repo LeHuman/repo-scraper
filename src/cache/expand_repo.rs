@@ -1,27 +1,33 @@
 use std::collections::{BTreeMap, BTreeSet};
 
-use crate::reposcrape::{Project, Repo};
-
-use super::Cache;
+use crate::{
+    cache::Cache,
+    reposcrape::{Project, Repo},
+};
 
 #[derive(Eq, PartialEq, Default, Debug)]
-pub struct ExpandedCache<'c> {
+pub struct ExpandedRepoCache<'c> {
     pub repos: BTreeMap<&'c String, &'c Repo>,
     pub single_repos: BTreeSet<&'c Repo>,
     pub projects: BTreeMap<&'c String, Project<'c>>,
 }
 
-impl<'c> ExpandedCache<'c> {
-    pub fn new(cache: &'c Cache) -> ExpandedCache<'c> {
-        let mut expanded = ExpandedCache::default();
+impl<'c> ExpandedRepoCache<'c> {
+    pub fn new(cache: &'c Cache) -> ExpandedRepoCache<'c> {
+        let mut expanded = ExpandedRepoCache::default();
 
         if cache.is_empty() {
             return expanded;
         }
 
-        expanded.repos = cache.repos.iter().map(|repo| (&repo.uid, repo)).collect();
+        expanded.repos = cache
+            .repos
+            .data
+            .iter()
+            .map(|repo| (&repo.uid, repo))
+            .collect();
 
-        for repo in &cache.repos {
+        for repo in &cache.repos.data {
             let mut single_repo = true;
             if let Some(details) = &repo.details {
                 if let Some(project_name) = &details.project {

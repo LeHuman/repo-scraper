@@ -1,7 +1,7 @@
 use std::collections::BTreeSet;
 
 use crate::{
-    cache::Cache,
+    cache::{cache::Cachable, Cache},
     date::Epoch,
     reposcrape::{Repo, RepoDetails},
 };
@@ -72,7 +72,14 @@ pub fn test_cache_encode_decode() -> Result<(), Box<dyn std::error::Error>> {
         }),
     });
 
-    let dummy_load_start = Cache::new(Some(repos), None);
+    let dummy_load_start = Cache::new(
+        Some(Cachable {
+            data: repos,
+            days_to_update: 0,
+            last_update: 0,
+        }),
+        None,
+    );
 
     let dump = dummy_load_start._dump()?;
 

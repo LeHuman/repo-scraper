@@ -1,7 +1,10 @@
 mod cache;
-mod expand;
 
+pub use cache::Cachable;
 pub use cache::Cache;
-pub use expand::ExpandedCache;
+pub use cache::Update;
+
+mod expand_repo;
+pub use expand_repo::ExpandedRepoCache;
 
 pub mod test;
