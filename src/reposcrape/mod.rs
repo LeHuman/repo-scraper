@@ -1,12 +1,15 @@
-pub mod date;
-pub use date::Epoch;
-pub mod metadata;
+mod metadata;
 pub use metadata::Metadata;
-pub mod repo;
+
+mod repo;
+pub use repo::Repo;
+pub use repo::RepoDetails;
+
+mod project;
+pub use project::Project;
 
 pub mod cache;
-pub mod expand;
-pub mod project;
+
 pub mod query;
 
 pub mod test;

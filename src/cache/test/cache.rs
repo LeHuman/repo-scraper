@@ -1,9 +1,9 @@
 use std::collections::BTreeSet;
 
-use crate::reposcrape::{
-    cache::Cache,
-    repo::{Repo, RepoDetails},
-    Epoch,
+use crate::{
+    cache::{cache::Cachable, Cache},
+    date::Epoch,
+    reposcrape::{cache::RepoScrapeCache, Repo, RepoDetails},
 };
 
 pub fn test_cache_encode_decode() -> Result<(), Box<dyn std::error::Error>> {
@@ -72,11 +72,18 @@ pub fn test_cache_encode_decode() -> Result<(), Box<dyn std::error::Error>> {
         }),
     });
 
-    let dummy_load_start = Cache::new(repos);
+    let dummy_load_start = RepoScrapeCache::new(
+        Some(Cachable {
+            data: repos,
+            days_to_update: 0,
+            last_update: 0,
+        }),
+        None,
+    );
 
     let dump = dummy_load_start._dump()?;
 
-    let dummy_load_end = Cache::_load(&dump)?;
+    let dummy_load_end = RepoScrapeCache::_load(&dump)?;
 
     assert!(dummy_load_end == dummy_load_start);
 

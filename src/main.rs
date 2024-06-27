@@ -3,14 +3,17 @@ use std::fs;
 use std::io::Write;
 use std::path::Path;
 
+use cache::Cache;
+use cache::Update;
 use octocrab::Octocrab;
 
-use reposcrape::{
-    cache::Cache,
-    expand::ExpandedCache,
-    query::{github::GHQuery, query::QueryInterface},
-};
+use reposcrape::cache::ExpandedRepoCache;
+use reposcrape::cache::RepoScrapeCache;
+use reposcrape::query::{github::GHQuery, query::QueryInterface};
+
+mod cache;
 mod color;
+mod date;
 mod reposcrape;
 
 fn html_test() {
@@ -83,21 +86,27 @@ async fn color_test() {
 // }
 
 async fn example(cache_file: &str) -> Result<(), Box<dyn std::error::Error>> {
-    let mut cache = Cache::load(cache_file);
+    let mut cache = RepoScrapeCache::load(cache_file);
 
-    if cache.is_empty() || cache.days_old(14) {
+    if cache.is_empty() || cache.repos.is_outdated() {
+        let colors = color::fetch_language_colors().await;
+
         let octocrab = Octocrab::builder()
             .user_access_token(env::var("GITHUB_TOKEN").expect("No Github token"))
             .build()?;
         let query = GHQuery::new(octocrab);
 
-        let fetched = query.fetch_latest("LeHuman", 8).await?;
+        let fetched = query.fetch_latest("LeHuman", 64).await?;
 
-        cache.update(&fetched);
+        cache.repos.update(&fetched);
+        if let Ok(colors) = colors {
+            // TODO: Should colors be obtained through query? Or keep this as a general resource?
+            cache.colors.update(&colors);
+        }
         cache.save(cache_file)?;
     }
 
-    let expanded = ExpandedCache::new(&cache);
+    let expanded = ExpandedRepoCache::new(&cache);
 
     println!("{:#?}", expanded);
 
@@ -108,10 +117,10 @@ async fn example(cache_file: &str) -> Result<(), Box<dyn std::error::Error>> {
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     color_test().await;
     reposcrape::test::repo::test_repo_create()?;
-    reposcrape::test::cache::test_cache_encode_decode()?;
-    reposcrape::test::expand::test_expand_cache()?;
-    reposcrape::query::test::github::test_github_retrieve().await?;
+    cache::test::cache::test_cache_encode_decode()?;
+    reposcrape::cache::test::expand_repo::test_expand_cache()?;
+    // reposcrape::query::test::github::test_github_retrieve().await?;
     example("./.cache").await?;
-    html_test();
+    // html_test();
     Ok(())
 }
