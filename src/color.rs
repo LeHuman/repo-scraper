@@ -1,6 +1,6 @@
 use reqwest::get;
 use serde::Deserialize;
-use std::collections::HashMap;
+use std::collections::HashMap; // IMPROVE: Serialized size of HashMap vs BTreeMap vs patricia_tree
 
 pub async fn fetch_language_colors() -> Result<HashMap<String, String>, Box<dyn std::error::Error>>
 {
