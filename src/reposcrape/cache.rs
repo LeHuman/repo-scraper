@@ -63,6 +63,12 @@ impl Cache {
         self.repos.len() == 0
     }
 
+    pub fn days_old(&self, days: u32) -> bool {
+        let local = Epoch::get_local();
+        let millis = (days * 24 * 60 * 60 * 100).into();
+        (self.last_update < local) && (local - self.last_update > millis)
+    }
+
     // pub fn expand(&self) -> ExpandedCache {
     //     ExpandedCache::new(self)
     // }

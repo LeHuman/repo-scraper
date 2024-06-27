@@ -73,15 +73,17 @@ fn html_test() {
 async fn example(cache_file: &str) -> Result<(), Box<dyn std::error::Error>> {
     let mut cache = Cache::load(cache_file);
 
-    let octocrab = Octocrab::builder()
-        .user_access_token(env::var("GITHUB_TOKEN").expect("No Github token"))
-        .build()?;
-    let query = GHQuery::new(octocrab);
+    if cache.is_empty() || cache.days_old(14) {
+        let octocrab = Octocrab::builder()
+            .user_access_token(env::var("GITHUB_TOKEN").expect("No Github token"))
+            .build()?;
+        let query = GHQuery::new(octocrab);
 
-    let fetched = query.fetch_latest("LeHuman", 8).await?;
+        let fetched = query.fetch_latest("LeHuman", 8).await?;
 
-    cache.update(&fetched);
-    cache.save(cache_file)?;
+        cache.update(&fetched);
+        cache.save(cache_file)?;
+    }
 
     let expanded = ExpandedCache::new(&cache);
 
