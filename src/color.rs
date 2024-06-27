@@ -1,0 +1,27 @@
+use reqwest::get;
+use serde::Deserialize;
+use std::collections::HashMap;
+
+pub async fn fetch_language_colors() -> Result<HashMap<String, String>, Box<dyn std::error::Error>>
+{
+    let url = "https://github.com/github-linguist/linguist/raw/master/lib/linguist/languages.yml";
+    let response = get(url).await?.text().await?;
+
+    #[derive(Debug, Deserialize)]
+    struct Language {
+        color: Option<String>,
+    }
+
+    // Parse the YAML content
+    let languages: HashMap<String, Language> = serde_yaml::from_str(&response)?;
+
+    // Create a map of language to color code, filtering out languages without a color
+    let mut language_colors = HashMap::new();
+    for (lang, info) in languages.iter() {
+        if let Some(color) = &info.color {
+            language_colors.insert(lang.clone(), color.clone());
+        }
+    }
+
+    Ok(language_colors)
+}
