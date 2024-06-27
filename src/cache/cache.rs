@@ -1,4 +1,4 @@
-use std::collections::BTreeSet;
+use std::collections::{BTreeSet, HashMap};
 use std::io::{Read, Write};
 use std::{fs, io};
 
@@ -7,10 +7,8 @@ use flate2::bufread::ZlibDecoder;
 use flate2::write::ZlibEncoder;
 use flate2::Compression;
 
-use super::date::EpochType;
-// use super::expand::ExpandedCache;
-use super::repo::Repo;
-use super::Epoch;
+use crate::date::{Epoch, EpochType};
+use crate::reposcrape::Repo;
 
 struct BinIO<'a> {
     encoder: &'a mut ZlibEncoder<Vec<u8>>,
@@ -45,13 +43,15 @@ impl Writer for BinIO<'_> {
 pub struct Cache {
     pub repos: BTreeSet<Repo>,
     pub last_update: EpochType,
+    pub colors: HashMap<String, String>,
 }
 
 impl Cache {
-    pub fn new(repos: BTreeSet<Repo>) -> Cache {
+    pub fn new(repos: Option<BTreeSet<Repo>>, colors: Option<HashMap<String, String>>) -> Cache {
         Cache {
-            repos: repos,
+            repos: repos.unwrap_or_default(),
             last_update: Epoch::get_local(),
+            colors: colors.unwrap_or_default(),
         }
     }
 
@@ -129,11 +129,26 @@ impl Cache {
         }
     }
 
-    pub fn update(&mut self, repos: &BTreeSet<Repo>) {
+    pub fn update_repos(&mut self, repos: &BTreeSet<Repo>) {
         // TODO: Test if extending on incoming repos changes anything or if persistance depends on Ord impl
         let mut repos = repos.clone();
         repos.extend(self.repos.clone());
         self.repos = repos;
         self.last_update = Epoch::get_local();
     }
+
+    pub fn update_colors(&mut self, colors: &HashMap<String, String>) {
+        let mut colors = colors.to_owned();
+        colors.extend(self.colors.clone());
+        self.colors = colors;
+    }
+
+    // pub fn update(&mut self, other: &Cache) {
+    //     if !other.repos.is_empty() {
+    //         self.update_repos(&other.repos);
+    //     }
+    //     if !other.colors.is_empty() {
+    //         self.update_colors(&other.colors);
+    //     }
+    // }
 }

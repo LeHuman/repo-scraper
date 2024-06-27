@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::reposcrape::{repo::Repo, Epoch};
+use crate::{date::Epoch, reposcrape::Repo};
 
 pub fn test_repo_create() -> Result<(), Box<dyn std::error::Error>> {
     let mut metadata: HashMap<String, String> = HashMap::new();

@@ -2,7 +2,7 @@ use bincode::{Decode, Encode};
 use set_field::SetField;
 use std::{cmp::Ordering, collections::HashMap};
 
-use super::date::EpochType;
+use crate::date::EpochType;
 
 // TODO: map details to color codes if possible, look into phf crate for static maps
 

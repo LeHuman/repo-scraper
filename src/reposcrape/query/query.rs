@@ -1,4 +1,4 @@
-use crate::reposcrape::{date::EpochType, repo::Repo};
+use crate::{date::EpochType, reposcrape::Repo};
 use std::collections::BTreeSet;
 
 pub type QueryResult = Result<BTreeSet<Repo>, Box<dyn std::error::Error>>;

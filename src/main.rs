@@ -3,14 +3,15 @@ use std::fs;
 use std::io::Write;
 use std::path::Path;
 
+use cache::Cache;
+use cache::ExpandedCache;
 use octocrab::Octocrab;
 
-use reposcrape::{
-    cache::Cache,
-    expand::ExpandedCache,
-    query::{github::GHQuery, query::QueryInterface},
-};
+use reposcrape::query::{github::GHQuery, query::QueryInterface};
+
+mod cache;
 mod color;
+mod date;
 mod reposcrape;
 
 fn html_test() {
@@ -86,6 +87,8 @@ async fn example(cache_file: &str) -> Result<(), Box<dyn std::error::Error>> {
     let mut cache = Cache::load(cache_file);
 
     if cache.is_empty() || cache.days_old(14) {
+        let colors = color::fetch_language_colors().await;
+
         let octocrab = Octocrab::builder()
             .user_access_token(env::var("GITHUB_TOKEN").expect("No Github token"))
             .build()?;
@@ -93,7 +96,11 @@ async fn example(cache_file: &str) -> Result<(), Box<dyn std::error::Error>> {
 
         let fetched = query.fetch_latest("LeHuman", 8).await?;
 
-        cache.update(&fetched);
+        cache.update_repos(&fetched);
+        if let Ok(colors) = colors {
+            // TODO: Should colors be obtained through query? Or keep this as a general resource?
+            cache.update_colors(&colors);
+        }
         cache.save(cache_file)?;
     }
 
@@ -108,8 +115,8 @@ async fn example(cache_file: &str) -> Result<(), Box<dyn std::error::Error>> {
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     color_test().await;
     reposcrape::test::repo::test_repo_create()?;
-    reposcrape::test::cache::test_cache_encode_decode()?;
-    reposcrape::test::expand::test_expand_cache()?;
+    cache::test::cache::test_cache_encode_decode()?;
+    cache::test::expand::test_expand_cache()?;
     reposcrape::query::test::github::test_github_retrieve().await?;
     example("./.cache").await?;
     html_test();

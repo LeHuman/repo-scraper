@@ -1,5 +1,8 @@
-use super::{cache::Cache, project::Project, repo::Repo};
 use std::collections::{BTreeMap, BTreeSet};
+
+use crate::reposcrape::{Project, Repo};
+
+use super::Cache;
 
 #[derive(Eq, PartialEq, Default, Debug)]
 pub struct ExpandedCache<'c> {

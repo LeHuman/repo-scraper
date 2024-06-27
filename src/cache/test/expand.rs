@@ -1,12 +1,12 @@
 use std::collections::BTreeSet;
 
-use crate::reposcrape::{
-    cache::Cache,
-    repo::{Repo, RepoDetails},
-    Epoch,
+use crate::{
+    cache::{Cache, ExpandedCache},
+    date::Epoch,
+    reposcrape::{Repo, RepoDetails},
 };
 
-pub fn test_cache_encode_decode() -> Result<(), Box<dyn std::error::Error>> {
+pub fn test_expand_cache() -> Result<(), Box<dyn std::error::Error>> {
     let mut repos: BTreeSet<Repo> = BTreeSet::new();
     repos.insert(Repo {
         uid: "github/Username/Repo0".into(),
@@ -72,13 +72,13 @@ pub fn test_cache_encode_decode() -> Result<(), Box<dyn std::error::Error>> {
         }),
     });
 
-    let dummy_load_start = Cache::new(repos);
+    let dummy_cache = Cache::new(Some(repos), None);
 
-    let dump = dummy_load_start._dump()?;
+    let expanded_cache = ExpandedCache::new(&dummy_cache);
 
-    let dummy_load_end = Cache::_load(&dump)?;
-
-    assert!(dummy_load_end == dummy_load_start);
+    assert!(expanded_cache.repos.len() == 3);
+    assert!(expanded_cache.projects.len() == 1);
+    assert!(expanded_cache.single_repos.len() == 1);
 
     Ok(())
 }

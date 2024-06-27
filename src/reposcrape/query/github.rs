@@ -2,9 +2,7 @@ use std::collections::BTreeSet;
 
 use octocrab::Octocrab;
 
-use crate::reposcrape::date::EpochType;
-use crate::reposcrape::Epoch;
-use crate::reposcrape::{repo::Repo, Metadata};
+use crate::{date::{EpochType, Epoch}, reposcrape::{Repo, Metadata}};
 
 use super::query::{QueryInterface, QueryResult};
 

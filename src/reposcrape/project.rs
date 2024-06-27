@@ -1,4 +1,4 @@
-use super::repo::Repo;
+use super::Repo;
 
 use std::collections::BTreeSet;
 
