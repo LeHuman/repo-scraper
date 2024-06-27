@@ -1,7 +1,10 @@
 use octocrab::Octocrab;
 use std::env;
 
-use crate::{date::Epoch, reposcrape::query::{github::GHQuery, query::QueryInterface}};
+use crate::{
+    date::Epoch,
+    reposcrape::query::{github::GHQuery, query::QueryInterface},
+};
 
 pub async fn test_github_retrieve() -> Result<(), Box<dyn std::error::Error>> {
     // let personal_token = SecretString::new(String::from(std::env::var("PERSONAL_GITHUB_TOKEN")?));

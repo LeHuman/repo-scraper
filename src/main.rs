@@ -7,8 +7,8 @@ use cache::Cache;
 use cache::Update;
 use octocrab::Octocrab;
 
-use reposcrape::query::{github::GHQuery, query::QueryInterface};
 use cache::ExpandedRepoCache;
+use reposcrape::query::{github::GHQuery, query::QueryInterface};
 
 mod cache;
 mod color;
