@@ -333,6 +333,25 @@ tbody tr:nth-child(odd) th {
     margin-bottom: 2em;
 }
 
+.logo {
+    font-size: 1.25rem;
+    width: fit-content;
+}
+
+.top-logo h1 {
+    font-size: 1.5rem;
+}
+
+.logo img {
+    width: 20rem;
+    margin-bottom: 1rem;
+}
+
+.top-logo img {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
 .section {
     margin-bottom: 1em;
 }

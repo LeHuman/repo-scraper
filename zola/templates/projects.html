@@ -10,7 +10,17 @@
     <div class="post">
         <h1 class="post-title">
             {% set __section = get_section(path="./projects/" ~ _page.title ~ "/_index.md") %}
+            {% if __section.extra.logo %}
+            <div class="logo">
+                <a href="{{get_url(path=__section.path)}}"><img src="{{__section.extra.logo}}"
+                        alt="{{__section.title}}"></a>
+                <a href="{{get_url(path=__section.path)}}">
+                    {{__section.title}}
+                </a>
+            </div>
+            {% else %}
             <a href="{{get_url(path=__section.path)}}">{{__section.title | safe}}</a>
+            {% endif%}
         </h1>
 
         <span class="post-date">{{ _page.date | date(format="%Y-%m-%d") }}</span>
