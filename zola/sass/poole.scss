@@ -330,10 +330,25 @@ tbody tr:nth-child(odd) th {
 
 .page,
 .post {
-    margin-bottom: 4em;
+    margin-bottom: 2em;
+}
+
+.section {
+    margin-bottom: 1em;
+}
+
+.section p {
+    font-size: 90%;
+    margin-bottom: 0.2rem;
+}
+
+p em {
+    color: #666666;
+    font-size: 80%;
 }
 
 /* Blog post or page title */
+.section-title,
 .page-title,
 .post-title,
 .post-title a {

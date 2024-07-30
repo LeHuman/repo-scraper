@@ -178,6 +178,7 @@ a.sidebar-nav-item:focus {
  */
 
 @media (min-width: 48em) {
+
     .sidebar-sticky {
         position: absolute;
         right: 1rem;
@@ -216,8 +217,8 @@ a.sidebar-nav-item:focus {
  */
 
 .content {
-    padding-top: 4rem;
-    padding-bottom: 4rem;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
 }
 
 @supports(padding: m#{a}x(0px)) {
@@ -242,6 +243,10 @@ a.sidebar-nav-item:focus {
 }
 
 @media (min-width: 64em) {
+    .content {
+        padding-top: 4rem;
+        padding-bottom: 4rem;
+    }
     .content {
         margin-left: 22rem;
         margin-right: 4rem;

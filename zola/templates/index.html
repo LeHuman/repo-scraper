@@ -12,9 +12,10 @@
     <title>{% block title %}{{ config.title }}{% endblock title %}</title>
 
     <!-- CSS -->
-    <link rel="stylesheet" href="print.css" media="print">
-    <link rel="stylesheet" href="poole.css">
-    <link rel="stylesheet" href="hyde.css">
+    <!-- TODO: Fix css for sub-sections and pages -->
+    <link rel="stylesheet" href="../../print.css" media="print">
+    <link rel="stylesheet" href="../../poole.css">
+    <link rel="stylesheet" href="../../hyde.css">
 
     {% if config.generate_feed %}
     <link rel="alternate" type={% if config.feed_filename=="atom.xml" %}"application/atom+xml"{% else
@@ -43,12 +44,30 @@
             <ul class="sidebar-nav">
                 {% block sidebar_nav %}
 
-                {% set section = get_section(path="_index.md") %}
-                {% for item in section.pages %}
+                {% set __item = get_page(path="./hello.md") %}
                 <li class="sidebar-nav-item">
-                    <a href="{{get_url(path=item.path)}}">{{item.title}}</a>
+                    <a href="{{get_url(path=__item.path)}}">{{__item.title}}</a>
                 </li>
-                {% endfor %}
+                {% set __section = get_section(path="latest/_index.md") %}
+                <li class="sidebar-nav-item">
+                    <a href="{{get_url(path=__section.path)}}">{{__section.title}}</a>
+                </li>
+                {% set __section = get_section(path="projects/_index.md") %}
+                <li class="sidebar-nav-item">
+                    <a href="{{get_url(path=__section.path)}}">{{__section.title}}</a>
+                </li>
+                {% set __section = get_section(path="repos/_index.md") %}
+                <li class="sidebar-nav-item">
+                    <a href="{{get_url(path=__section.path)}}">{{__section.title}}</a>
+                </li>
+                {% set __item = get_page(path="./contact.md") %}
+                <li class="sidebar-nav-item">
+                    <a href="{{get_url(path=__item.path)}}">{{__item.title}}</a>
+                </li>
+                {% set __item = get_page(path="./about.md") %}
+                <li class="sidebar-nav-item">
+                    <a href="{{get_url(path=__item.path)}}">{{__item.title}}</a>
+                </li>
 
                 {% for link in config.extra.hyde_links %}
                 <li class="sidebar-nav-item"><a href="{{link.url}}">{{link.name}}</a></li>
@@ -104,19 +123,10 @@
 
     <div class="content container">
         {% block content %}
-        <div class="posts">
-            {% for page in section.pages | reverse %}
-            <div class="post">
-                <h1 class="post-title">
-                    <a href="{{get_url(path=page.path)}}">{{page.title | safe}}</a>
-                    <!-- <a href="{{ page.permalink }}">
-                        {{ page.title | safe }}
-                    </a> -->
-                </h1>
-
-                <span class="post-date">{{ page.date | date(format="%Y-%m-%d") }}</span>
-            </div>
-            {% endfor %}
+        {% set __page = get_page(path="./hello.md") %}
+        <div class="post">
+            <h1 class="post-title">{{ __page.title }}</h1>
+            {{ __page.content | safe }}
         </div>
         {% endblock content %}
     </div>
