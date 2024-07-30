@@ -1,7 +1,7 @@
 +++
 title = "Latest"
 sort_by = "update_date"
-template = "latest.html"
+template = "repos.html"
 +++
 
 Latest updates to any GitHub project or repository of mine.
