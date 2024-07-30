@@ -84,6 +84,14 @@ html {
     font-size: 0.9rem;
 }
 
+.sidebar-minor a {
+    color: #666666;
+}
+
+.sidebar-minor a:hover {
+    color: #e2e2e2;
+}
+
 .sidebar-icon-row {
     display: flex;
     justify-content: center;
@@ -121,6 +129,9 @@ html {
     fill: #666666;
 }
 
+.sidebar-minor svg:hover {
+    fill: #e2e2e2;
+}
 
 /* About section */
 .sidebar-about h1 {
