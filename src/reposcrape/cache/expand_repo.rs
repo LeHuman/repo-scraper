@@ -1,9 +1,6 @@
 use std::collections::{BTreeMap, BTreeSet};
 
-use crate::{
-    cache::Cache,
-    reposcrape::{Project, Repo},
-};
+use crate::reposcrape::{Project, Repo};
 
 use super::cache::RepoScrapeCache;
 

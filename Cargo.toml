@@ -21,6 +21,8 @@ reqwest = { version = "0.12.5", features = ["blocking", "json"] }
 serde = { version = "1.0.203", features = ["derive"] }
 serde_yaml = "0.9.34"
 tracing = "0.1.40"
+localsavefile = "0.1.2"
+savefile = "0.17.6"
 
 [dev-dependencies]
 tracing-test = "0.2.5"

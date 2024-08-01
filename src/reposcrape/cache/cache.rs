@@ -1,16 +1,35 @@
-use std::collections::{BTreeSet, HashMap};
-
-use bincode::{Decode, Encode};
+use localsavefile::localsavefile;
+use std::collections::{HashMap, HashSet};
 
 use crate::{
-    cache::{Cachable, Cache, Update},
-    date::Epoch,
+    date::{Epoch, EpochType},
     reposcrape::Repo,
 };
 
-#[derive(Eq, PartialEq, Encode, Decode)]
+#[localsavefile]
+#[derive(Default, Eq, PartialEq)]
+pub struct Cachable<T> {
+    pub data: T,
+    pub days_to_update: u32,
+    pub last_update: EpochType,
+}
+
+impl<T> Cachable<T> {
+    pub fn is_outdated(&self) -> bool {
+        let local = Epoch::get_local();
+        let millis = (self.days_to_update * 24 * 60 * 60 * 100).into();
+        (self.last_update < local) && (local - self.last_update > millis)
+    }
+}
+
+pub trait Update<T> {
+    fn update(&mut self, other: &T);
+}
+
+#[localsavefile]
+#[derive(Eq, PartialEq)]
 pub struct RepoScrapeCache {
-    pub repos: Cachable<BTreeSet<Repo>>,
+    pub repos: Cachable<HashSet<Repo>>,
     pub colors: Cachable<HashMap<String, String>>,
 }
 
@@ -29,7 +48,7 @@ impl Default for RepoScrapeCache {
 
 impl RepoScrapeCache {
     pub fn new(
-        repos: Option<Cachable<BTreeSet<Repo>>>,
+        repos: Option<Cachable<HashSet<Repo>>>,
         colors: Option<Cachable<HashMap<String, String>>>,
     ) -> Self {
         Self {
@@ -37,16 +56,14 @@ impl RepoScrapeCache {
             colors: colors.unwrap_or_default(),
         }
     }
-}
 
-impl Cache for RepoScrapeCache {
-    fn is_empty(&self) -> bool {
+    pub fn is_empty(&self) -> bool {
         self.repos.data.is_empty()
     }
 }
 
-impl Update<BTreeSet<Repo>> for Cachable<BTreeSet<Repo>> {
-    fn update(&mut self, other: &BTreeSet<Repo>) {
+impl Update<HashSet<Repo>> for Cachable<HashSet<Repo>> {
+    fn update(&mut self, other: &HashSet<Repo>) {
         // TODO: Test if extending on incoming repos changes anything or if persistance depends on Ord impl
         let mut other = other.clone();
         other.extend(self.data.clone());
