@@ -6,6 +6,7 @@ use crate::reposcrape::{
     Epoch,
 };
 
+#[test]
 pub fn test_cache_encode_decode() -> Result<(), Box<dyn std::error::Error>> {
     let mut repos: BTreeSet<Repo> = BTreeSet::new();
     repos.insert(Repo {

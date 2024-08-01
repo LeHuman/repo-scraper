@@ -9,4 +9,5 @@ pub mod expand;
 pub mod project;
 pub mod query;
 
+#[cfg(test)]
 pub mod test;
