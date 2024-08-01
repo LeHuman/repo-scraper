@@ -1,17 +1,16 @@
-use std::collections::BTreeSet;
+use std::collections::HashSet;
 
 use crate::{
-    cache::Cachable,
     date::Epoch,
     reposcrape::{
-        cache::{ExpandedRepoCache, RepoScrapeCache},
+        cache::{Cachable, ExpandedRepoCache, RepoScrapeCache},
         Repo, RepoDetails,
     },
 };
 
 #[test]
 pub fn test_expand_cache() -> Result<(), Box<dyn std::error::Error>> {
-    let mut repos: BTreeSet<Repo> = BTreeSet::new();
+    let mut repos: HashSet<Repo> = HashSet::new();
     repos.insert(Repo {
         uid: "github/Username/Repo0".into(),
         id: "Username/Repo0".into(),
