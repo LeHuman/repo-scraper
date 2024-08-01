@@ -9,6 +9,7 @@ use crate::{
     },
 };
 
+#[test]
 pub fn test_expand_cache() -> Result<(), Box<dyn std::error::Error>> {
     let mut repos: BTreeSet<Repo> = BTreeSet::new();
     repos.insert(Repo {

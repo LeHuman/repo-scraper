@@ -12,4 +12,5 @@ pub mod cache;
 
 pub mod query;
 
+#[cfg(test)]
 pub mod test;

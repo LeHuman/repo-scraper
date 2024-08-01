@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use crate::{date::Epoch, reposcrape::Repo};
 
+#[test]
 pub fn test_repo_create() -> Result<(), Box<dyn std::error::Error>> {
     let mut metadata: HashMap<String, String> = HashMap::new();
 

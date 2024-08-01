@@ -9,7 +9,7 @@ license = "MIT OR Apache-2.0"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-octocrab = "0.38.0"
+octocrab = "0.39.0"
 tokio = { version = "1", features = ["full"] }
 serde_json = "1.0.117"
 chrono = "0.4.38"
@@ -20,3 +20,8 @@ set_field = "0.1.1"
 reqwest = { version = "0.12.5", features = ["blocking", "json"] }
 serde = { version = "1.0.203", features = ["derive"] }
 serde_yaml = "0.9.34"
+slug = "0.1.5"
+tracing = "0.1.40"
+
+[dev-dependencies]
+tracing-test = "0.2.5"
