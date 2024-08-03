@@ -2,7 +2,7 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use crate::reposcrape::{Project, Repo};
 
-use super::cache::RepoScrapeCache;
+use super::repo::RepoScrapeCache;
 
 #[derive(Eq, PartialEq, Default, Debug)]
 pub struct ExpandedRepoCache<'c> {

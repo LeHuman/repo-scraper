@@ -23,10 +23,10 @@ pub struct RepoDetails {
 }
 
 impl RepoDetails {
-    fn set(&mut self, key: &String, val: &String) -> bool {
+    fn set(&mut self, key: &str, val: &str) -> bool {
         // IMPROVE: attempt to 'cast' directly to type, instead of just trial and error, will need custom macro or just use serde
         let nkey = key.to_lowercase();
-        if self.set_field(&nkey, Some(val.clone())) {
+        if self.set_field(&nkey, Some(String::from(val))) {
             return true;
         };
 
@@ -49,7 +49,15 @@ impl RepoDetails {
                 Ok(val) => Some(val),
                 Err(_) => {
                     // NOTE: Special Hex value case for Vec<u32>
-                    u32::from_str_radix(if s.starts_with('#') { &s[1..] } else { &s }, 16).ok()
+                    u32::from_str_radix(
+                        if let Some(stripped) = s.strip_prefix('#') {
+                            stripped
+                        } else {
+                            &s
+                        },
+                        16,
+                    )
+                    .ok()
                 }
             })
             .collect();
@@ -57,7 +65,7 @@ impl RepoDetails {
             return true;
         };
 
-        return false;
+        false
     }
 }
 
@@ -78,7 +86,7 @@ pub struct Repo {
 impl Ord for Repo {
     fn cmp(&self, other: &Self) -> Ordering {
         if self == other {
-            return self.last_sync.cmp(&other.last_sync);
+            self.last_sync.cmp(&other.last_sync)
         } else {
             self.last_update
                 .cmp(&other.last_update)
@@ -112,7 +120,7 @@ impl Repo {
         let mut details = RepoDetails::default();
         let mut update: bool = false;
         for (key, val) in metadata {
-            if !details.set(&key, &val) {
+            if !details.set(key, val) {
                 println!("Failed to set {} {}", key, val);
             } else {
                 update = true;
@@ -120,15 +128,15 @@ impl Repo {
         }
         let mut uid = origin.to_owned();
         uid.push('/');
-        uid.push_str(&id.as_str());
+        uid.push_str(id.as_str());
         Repo {
-            uid: uid,
-            id: id,
-            name: name,
-            owner: owner,
-            origin: origin,
-            last_sync: last_sync,
-            last_update: last_update,
+            uid,
+            id,
+            name,
+            owner,
+            origin,
+            last_sync,
+            last_update,
             details: if update { Some(details) } else { None },
         }
     }

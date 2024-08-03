@@ -1,7 +1,7 @@
-mod cache;
-pub use cache::Update;
-pub use cache::Cachable;
-pub use cache::RepoScrapeCache;
+mod repo;
+pub use repo::Update;
+pub use repo::Cachable;
+pub use repo::RepoScrapeCache;
 
 mod expand_repo;
 pub use expand_repo::ExpandedRepoCache;

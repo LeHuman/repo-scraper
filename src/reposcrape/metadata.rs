@@ -29,7 +29,7 @@ impl Metadata {
                 }
             }
 
-            return String::new();
+            String::new()
         }
 
         for line in text.lines() {
@@ -37,7 +37,7 @@ impl Metadata {
             if captures.is_some() {
                 let result = captures.expect("Failed to capture line regex");
                 if result.name("start").is_some() {
-                    if section_enable == true {
+                    if section_enable {
                         // TODO: warn on malformed section
                         // continue;
                     }
@@ -51,7 +51,7 @@ impl Metadata {
                     section_enable = true;
                 } else if result.name("end").is_some() {
                     let name = result.name("end").expect("Failed to get end name").as_str();
-                    if (section_enable != true)
+                    if (!section_enable)
                         || (extract_metadata_section_name(&re_section, name) != section_name)
                     {
                         // TODO: warn on malformed section
@@ -76,13 +76,13 @@ impl Metadata {
                 // TODO: warn that capture detected but unable to parse
             } else if section_enable {
                 let trimmed = line.trim();
-                if trimmed != "" {
+                if !trimmed.is_empty() {
                     section_accumulator.push_str(trimmed);
                     section_accumulator.push(' ');
                 }
             }
         }
 
-        return map;
+        map
     }
 }
