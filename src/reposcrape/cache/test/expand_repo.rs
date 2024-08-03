@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use std::collections::BTreeSet;
 
 use crate::{
     date::Epoch,
@@ -10,7 +10,7 @@ use crate::{
 
 #[test]
 pub fn test_expand_cache() -> Result<(), Box<dyn std::error::Error>> {
-    let mut repos: HashSet<Repo> = HashSet::new();
+    let mut repos: BTreeSet<Repo> = BTreeSet::new();
     repos.insert(Repo {
         uid: "github/Username/Repo0".into(),
         id: "Username/Repo0".into(),
@@ -30,6 +30,7 @@ pub fn test_expand_cache() -> Result<(), Box<dyn std::error::Error>> {
             technology: Some(Vec::from(["GH Actions".into(), "https".into()])),
             status: Some("Work In Progress".into()),
             main: Some("".into()),
+            children: None,
         }),
     });
     repos.insert(Repo {
@@ -51,6 +52,7 @@ pub fn test_expand_cache() -> Result<(), Box<dyn std::error::Error>> {
             technology: Some(Vec::from(["https".into()])),
             status: Some("Archive".into()),
             main: Some("this".into()),
+            children: None,
         }),
     });
     repos.insert(Repo {
@@ -72,6 +74,7 @@ pub fn test_expand_cache() -> Result<(), Box<dyn std::error::Error>> {
             technology: Some(Vec::from(["tech2".into()])),
             status: Some("Work In Progress".into()),
             main: None,
+            children: None,
         }),
     });
 
