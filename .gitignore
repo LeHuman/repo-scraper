@@ -1,5 +1,6 @@
 /target
 /debug
+/zola
 .cargo-ok
 .DS_Store
 .env
