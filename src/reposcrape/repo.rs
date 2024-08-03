@@ -1,4 +1,3 @@
-use bincode::{Decode, Encode};
 use localsavefile::localsavefile;
 use set_field::SetField;
 use std::{cmp::Ordering, collections::HashMap};
@@ -8,7 +7,7 @@ use crate::date::EpochType;
 // TODO: map details to color codes if possible, look into phf crate for static maps
 
 #[localsavefile]
-#[derive(Eq, PartialEq, Encode, Decode, Default, SetField, Clone, Debug, Hash)]
+#[derive(Eq, PartialEq, SetField, Clone, Debug, Hash)]
 pub struct RepoDetails {
     pub project: Option<String>,
     pub main: Option<String>, // NOTE: Special option that defines this repo as the main for it's project, it's value does not matter but it should have a value
@@ -18,6 +17,7 @@ pub struct RepoDetails {
     pub keywords: Option<Vec<String>>,
     pub languages: Option<Vec<String>>,
     pub technology: Option<Vec<String>>,
+    pub children: Option<Vec<String>>,
     pub status: Option<String>,
     pub description: Option<String>,
 }
@@ -62,7 +62,7 @@ impl RepoDetails {
 }
 
 #[localsavefile]
-#[derive(Eq, Default, Clone, Debug, Hash)]
+#[derive(Eq, Clone, Debug)]
 pub struct Repo {
     pub uid: String,
     pub id: String,
