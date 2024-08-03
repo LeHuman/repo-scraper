@@ -1,5 +1,6 @@
-use localsavefile::localsavefile;
-use std::collections::{HashMap, HashSet};
+use localsavefile::{localsavefile, localsavefile_impl};
+use savefile::prelude::Savefile;
+use std::collections::{BTreeSet, HashMap};
 
 use crate::{
     date::{Epoch, EpochType},
@@ -7,7 +8,7 @@ use crate::{
 };
 
 #[localsavefile]
-#[derive(Default, Eq, PartialEq)]
+#[derive(Eq, PartialEq)]
 pub struct Cachable<T> {
     pub data: T,
     pub days_to_update: u32,
@@ -26,10 +27,15 @@ pub trait Update<T> {
     fn update(&mut self, other: &T);
 }
 
-#[localsavefile]
-#[derive(Eq, PartialEq)]
+#[derive(Savefile)]
+struct Data {
+    data: std::collections::BTreeMap<u32, u32>,
+}
+
+#[localsavefile_impl]
+#[derive(Eq, PartialEq, Savefile)]
 pub struct RepoScrapeCache {
-    pub repos: Cachable<HashSet<Repo>>,
+    pub repos: Cachable<BTreeSet<Repo>>,
     pub colors: Cachable<HashMap<String, String>>,
 }
 
@@ -48,7 +54,7 @@ impl Default for RepoScrapeCache {
 
 impl RepoScrapeCache {
     pub fn new(
-        repos: Option<Cachable<HashSet<Repo>>>,
+        repos: Option<Cachable<BTreeSet<Repo>>>,
         colors: Option<Cachable<HashMap<String, String>>>,
     ) -> Self {
         Self {
@@ -62,8 +68,8 @@ impl RepoScrapeCache {
     }
 }
 
-impl Update<HashSet<Repo>> for Cachable<HashSet<Repo>> {
-    fn update(&mut self, other: &HashSet<Repo>) {
+impl Update<BTreeSet<Repo>> for Cachable<BTreeSet<Repo>> {
+    fn update(&mut self, other: &BTreeSet<Repo>) {
         // TODO: Test if extending on incoming repos changes anything or if persistance depends on Ord impl
         let mut other = other.clone();
         other.extend(self.data.clone());
