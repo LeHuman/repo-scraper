@@ -46,6 +46,7 @@ impl GHQuery {
         today_epoch: EpochType,
     ) -> Option<Repo> {
         let id = repo_val["id"].as_str()?.to_owned();
+        let url = repo_val["url"].as_str()?.to_owned();
         let name: String = repo_val["name"].as_str()?.to_owned();
         let updated_at = repo_val["updatedAt"].as_str()?.to_owned();
         let updated_at = match Epoch::from_rfc3339(&updated_at) {
@@ -60,6 +61,7 @@ impl GHQuery {
         let metadata = Metadata::extract(readme_text);
         Some(Repo::new(
             id,
+            url,
             name,
             owner,
             ORIGIN.to_owned(),
@@ -128,6 +130,7 @@ fn qstr_single(username: &str, repository: &str) -> String {
         r#"query {{
             repository(owner: "{username}", name: "{repository}") {{
                 id
+                url
                 name
                 updatedAt
                 owner{{login}}
@@ -148,6 +151,7 @@ fn qstr_latest(username: &str, max_count: u32) -> String {
         repositories(first: {max_count}, orderBy: {{ field: UPDATED_AT, direction: DESC }}) {{
             nodes {{
                 id
+                url
                 name
                 updatedAt
                 owner{{login}}
@@ -177,6 +181,7 @@ search(type: REPOSITORY, first: {max_count}, query: "user:{username} pushed:>{lo
     nodes {{
     ... on Repository {{
         id
+        url
         name
         updatedAt
         owner{{login}}

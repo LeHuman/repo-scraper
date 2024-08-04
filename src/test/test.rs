@@ -34,7 +34,7 @@ fn example() -> Result<(), Box<dyn std::error::Error>> {
         cache.save()?;
     }
 
-    let expanded = ExpandedRepoCache::new(&cache);
+    let expanded = ExpandedRepoCache::new(cache);
 
     println!("{:#?}", expanded);
 

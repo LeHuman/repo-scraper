@@ -1,5 +1,7 @@
 use std::collections::BTreeSet;
 
+use localsavefile::LocalSaveFile;
+
 use crate::{
     date::Epoch,
     reposcrape::{
@@ -14,6 +16,7 @@ pub fn test_expand_cache() -> Result<(), Box<dyn std::error::Error>> {
     repos.insert(Repo {
         uid: "github/Username/Repo0".into(),
         id: "Username/Repo0".into(),
+        url: "".into(),
         name: "Repo0".into(),
         owner: "Username0".into(),
         origin: "github".into(),
@@ -36,6 +39,7 @@ pub fn test_expand_cache() -> Result<(), Box<dyn std::error::Error>> {
     repos.insert(Repo {
         uid: "github/Username/Repo1".into(),
         id: "Username/Repo1".into(),
+        url: "".into(),
         name: "Repo1".into(),
         owner: "Username1".into(),
         origin: "github".into(),
@@ -58,6 +62,7 @@ pub fn test_expand_cache() -> Result<(), Box<dyn std::error::Error>> {
     repos.insert(Repo {
         uid: "github/Username/Repo2".into(),
         id: "Username/Repo2".into(),
+        url: "".into(),
         name: "Repo2".into(),
         owner: "Username0".into(),
         origin: "github".into(),
@@ -87,11 +92,10 @@ pub fn test_expand_cache() -> Result<(), Box<dyn std::error::Error>> {
         None,
     );
 
-    let expanded_cache = ExpandedRepoCache::new(&dummy_cache);
+    let expanded_cache = ExpandedRepoCache::from(dummy_cache);
 
-    assert!(expanded_cache.repos.len() == 3);
+    assert!(expanded_cache.repos.len() == 1);
     assert!(expanded_cache.projects.len() == 1);
-    assert!(expanded_cache.single_repos.len() == 1);
 
     Ok(())
 }

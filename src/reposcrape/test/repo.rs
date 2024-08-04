@@ -8,6 +8,7 @@ pub fn test_repo_create() -> Result<(), Box<dyn std::error::Error>> {
 
     let r0 = Repo::new(
         "test".into(),
+        "".into(),
         "bru".into(),
         "oof".into(),
         "okay".into(),
@@ -33,6 +34,7 @@ pub fn test_repo_create() -> Result<(), Box<dyn std::error::Error>> {
         "".into(),
         "".into(),
         "".into(),
+        "".into(),
         Epoch::from_rfc3339("2021-06-14T08:19:26Z")?,
         Epoch::from_rfc3339("2021-06-14T08:19:26Z")?,
         &metadata,
@@ -52,6 +54,7 @@ pub fn test_repo_create() -> Result<(), Box<dyn std::error::Error>> {
 
     let r2 = Repo::new(
         "fff".into(),
+        "".into(),
         "35".into(),
         "atw".into(),
         "gadd".into(),

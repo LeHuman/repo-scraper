@@ -9,7 +9,7 @@ use crate::date::EpochType;
 #[localsavefile]
 #[derive(Eq, PartialEq, SetField, Clone, Debug, Hash)]
 pub struct RepoDetails {
-    pub project: Option<String>,
+    pub project: Option<String>, // NOTE: Only attach project when the repository is part of a project
     pub main: Option<String>, // NOTE: Special option that defines this repo as the main for it's project, it's value does not matter but it should have a value
     pub title: Option<String>,
     pub font: Option<Vec<String>>,
@@ -17,7 +17,7 @@ pub struct RepoDetails {
     pub keywords: Option<Vec<String>>,
     pub languages: Option<Vec<String>>,
     pub technology: Option<Vec<String>>,
-    pub children: Option<Vec<String>>,
+    pub children: Option<String>, // NOTE: Only relevant if this is a main repository for a project, ignored otherwise
     pub status: Option<String>,
     pub description: Option<String>,
 }
@@ -74,6 +74,7 @@ impl RepoDetails {
 pub struct Repo {
     pub uid: String,
     pub id: String,
+    pub url: String,
     pub name: String,
     pub owner: String,
     pub origin: String,
@@ -110,6 +111,7 @@ impl PartialEq for Repo {
 impl Repo {
     pub fn new(
         id: String,
+        url: String,
         name: String,
         owner: String,
         origin: String,
@@ -132,6 +134,7 @@ impl Repo {
         Repo {
             uid,
             id,
+            url,
             name,
             owner,
             origin,
