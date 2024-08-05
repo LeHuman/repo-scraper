@@ -1,4 +1,4 @@
-# repo-scraper
+# reposcrape
 
 <!-- [![Crates.io](https://img.shields.io/crates/v/repo-scraper.svg)](https://crates.io/crates/repo-scraper) -->
 [![Docs.rs](https://docs.rs/repo-scraper/badge.svg)](https://docs.rs/repo-scraper)
