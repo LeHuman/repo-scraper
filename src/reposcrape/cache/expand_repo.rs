@@ -81,7 +81,7 @@ impl ExpandedRepoCache {
             // Main repo for this project
             // NOTE: main repo for projects is optional
             if main_repo {
-                project.description = details.description.to_owned();
+                details.description.clone_into(&mut project.description);
                 project.repo_main = Some(repo);
             } else {
                 project.repo_sub.insert(repo);
@@ -92,7 +92,7 @@ impl ExpandedRepoCache {
 
         let client = reqwest::blocking::Client::new();
 
-        for (_key, project) in &expanded.projects {
+        for project in expanded.projects.values() {
             let Some(repo) = &project.repo_main else {
                 continue;
             };
@@ -104,7 +104,7 @@ impl ExpandedRepoCache {
             };
 
             // NOTE: Children stored as urls on individual lines, with the way the parser works, it is expected this is a single string containing all of them
-            let extracted_urls = extract_urls(&children);
+            let extracted_urls = extract_urls(children);
             if extracted_urls.len() == project.repo_sub.len() {
                 // TODO: Option to not skip project if count matches?
                 continue;

@@ -17,7 +17,7 @@ pub fn test_repo_create() -> Result<(), Box<dyn std::error::Error>> {
         &metadata,
     );
 
-    assert!(r0.details == None);
+    assert!(r0.details.is_none());
 
     metadata.insert("project".into(), "pablo".into());
     metadata.insert("TItle".into(), "hello".into());
@@ -40,7 +40,7 @@ pub fn test_repo_create() -> Result<(), Box<dyn std::error::Error>> {
         &metadata,
     );
 
-    assert!(&r1.details != &None);
+    assert!(r1.details.is_some());
     let details = &r1.details.unwrap();
     assert!(details.project == Some("pablo".into()));
     assert!(details.title == Some("hello".into()));

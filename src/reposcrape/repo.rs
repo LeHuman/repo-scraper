@@ -1,6 +1,7 @@
 use localsavefile::localsavefile;
 use set_field::SetField;
 use std::{cmp::Ordering, collections::HashMap};
+use tracing::warn;
 
 use crate::date::EpochType;
 
@@ -109,6 +110,7 @@ impl PartialEq for Repo {
 }
 
 impl Repo {
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         id: String,
         url: String,
@@ -123,7 +125,7 @@ impl Repo {
         let mut update: bool = false;
         for (key, val) in metadata {
             if !details.set(key, val) {
-                println!("Failed to set {} {}", key, val);
+                warn!("Failed to set {} {}", key, val);
             } else {
                 update = true;
             }
