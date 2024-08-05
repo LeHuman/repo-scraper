@@ -1,7 +1,8 @@
-use std::env;
+use std::{env, time::Duration};
 
 use localsavefile::LocalSaveFile;
-use octocrab::Octocrab;
+use tracing::Level;
+use tracing_subscriber::FmtSubscriber;
 
 use crate::{
     color,
@@ -11,20 +12,16 @@ use crate::{
     },
 };
 
-#[test]
-fn example() -> Result<(), Box<dyn std::error::Error>> {
+async fn run_example() -> Result<(), Box<dyn std::error::Error>> {
     let mut cache = RepoScrapeCache::load_default();
 
     if cache.is_empty() || cache.repos.is_outdated() {
-        let rt = tokio::runtime::Runtime::new().unwrap();
-        let colors = rt.block_on(color::fetch_language_colors());
+        let colors = color::fetch_language_colors().await;
+        let query = GHQuery::from_personal_token(
+            env::var("secrets.GITHUB_TOKEN").expect("No Github token"),
+        );
 
-        let octocrab = Octocrab::builder()
-            .user_access_token(env::var("GITHUB_TOKEN").expect("No Github token"))
-            .build()?;
-        let query = GHQuery::new(octocrab);
-
-        let fetched = rt.block_on(query.fetch_latest("LeHuman", 64))?;
+        let fetched = query.fetch_latest("LeHuman", 64).await?;
 
         cache.repos.update(&fetched);
         if let Ok(colors) = colors {
@@ -37,6 +34,19 @@ fn example() -> Result<(), Box<dyn std::error::Error>> {
     let expanded = ExpandedRepoCache::new(cache);
 
     println!("{:#?}", expanded);
-
     Ok(())
+}
+
+#[test]
+fn example() -> Result<(), Box<dyn std::error::Error>> {
+    let subscriber = FmtSubscriber::builder()
+        .with_max_level(Level::DEBUG)
+        .finish();
+    tracing::subscriber::set_global_default(subscriber).expect("Setting default subscriber failed");
+
+    dotenvy::dotenv()?;
+    let rt = tokio::runtime::Runtime::new().unwrap();
+    let a = rt.block_on(run_example());
+    rt.shutdown_timeout(Duration::from_secs(60));
+    a
 }
