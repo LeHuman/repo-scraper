@@ -4,7 +4,7 @@ authors = ["LeHuman"]
 version = "0.1.0"
 edition = "2021"
 description = "Repository scraper for presenting repositories on a personal website"
-repository = "https://github.com/LeHuman/repo-scraper"
+repository = "https://github.com/LeHuman/reposcrape"
 license = "MIT OR Apache-2.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

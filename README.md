@@ -1,8 +1,8 @@
 # reposcrape
 
-<!-- [![Crates.io](https://img.shields.io/crates/v/repo-scraper.svg)](https://crates.io/crates/repo-scraper) -->
-[![Docs.rs](https://docs.rs/repo-scraper/badge.svg)](https://docs.rs/repo-scraper)
-[![CI](https://github.com/LeHuman/repo-scraper/workflows/CI/badge.svg)](https://github.com/LeHuman/repo-scraper/actions)
+[![Crates.io](https://img.shields.io/crates/v/reposcrape.svg)](https://crates.io/crates/reposcrape)
+[![Docs.rs](https://docs.rs/reposcrape/badge.svg)](https://docs.rs/reposcrape)
+[![CI](https://github.com/LeHuman/reposcrape/workflows/CI/badge.svg)](https://github.com/LeHuman/reposcrape/actions)
 
 ## Installation
 
@@ -10,16 +10,16 @@
 
 * Install the rust toolchain in order to have cargo installed by following
   [this](https://www.rust-lang.org/tools/install) guide.
-* run `cargo install repo-scraper` -->
+* run `cargo install reposcrape` -->
 
 ## License
 
 Licensed under either of
 
- * Apache License, Version 2.0
-   ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
- * MIT license
-   ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
+* Apache License, Version 2.0
+   ([LICENSE-APACHE](LICENSE-APACHE) or <http://www.apache.org/licenses/LICENSE-2.0>)
+* MIT license
+   ([LICENSE-MIT](LICENSE-MIT) or <http://opensource.org/licenses/MIT>)
 
 at your option.
 
