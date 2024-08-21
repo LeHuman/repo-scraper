@@ -1,6 +1,5 @@
 use std::collections::BTreeSet;
 
-
 use crate::{
     date::Epoch,
     reposcrape::{
@@ -10,6 +9,7 @@ use crate::{
 };
 
 #[test]
+#[tracing_test::traced_test]
 pub fn test_expand_cache() -> Result<(), Box<dyn std::error::Error>> {
     let mut repos: BTreeSet<Repo> = BTreeSet::new();
     repos.insert(Repo {
@@ -91,7 +91,8 @@ pub fn test_expand_cache() -> Result<(), Box<dyn std::error::Error>> {
         None,
     );
 
-    let expanded_cache = ExpandedRepoCache::from(dummy_cache);
+    let rt = tokio::runtime::Runtime::new().unwrap();
+    let expanded_cache = rt.block_on(ExpandedRepoCache::new(dummy_cache));
 
     assert!(expanded_cache.repos.len() == 1);
     assert!(expanded_cache.projects.len() == 1);

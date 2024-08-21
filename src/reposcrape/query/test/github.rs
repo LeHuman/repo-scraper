@@ -7,6 +7,19 @@ use crate::{
     reposcrape::query::{github::GHQuery, query_trait::QueryInterface},
 };
 
+async fn _test_github_retrieve(token: String) -> Result<(), Box<dyn std::error::Error>> {
+    let octocrab = Octocrab::builder().user_access_token(token).build()?;
+    let query = GHQuery::new(octocrab);
+
+    let _latest = query.fetch_latest("LeHuman", 8).await?;
+    let _dated = query
+        .fetch_after("LeHuman", 4, Epoch::from_rfc3339("2022-05-14T19:19:26Z")?)
+        .await?;
+
+    debug!("{:?}\n{:?}\n", _latest, _dated);
+    Ok(())
+}
+
 #[test]
 #[tracing_test::traced_test]
 pub fn test_github_retrieve() -> Result<(), Box<dyn std::error::Error>> {
@@ -14,17 +27,6 @@ pub fn test_github_retrieve() -> Result<(), Box<dyn std::error::Error>> {
         warn!("No GITHUB_TOKEN set in env. Skipping github retrieve test");
         return Ok(());
     };
-    // let personal_token = SecretString::new(String::from(std::env::var("PERSONAL_GITHUB_TOKEN")?));
-    let octocrab = Octocrab::builder().user_access_token(token).build()?;
-    let query = GHQuery::new(octocrab);
-
     let rt = tokio::runtime::Runtime::new().unwrap();
-
-    let _latest = rt.block_on(query.fetch_latest("LeHuman", 8))?;
-    let _dated =
-        rt.block_on(query.fetch_after("LeHuman", 4, Epoch::from_rfc3339("2022-05-14T19:19:26Z")?))?;
-
-    debug!("{:?}\n{:?}\n", _latest, _dated);
-
-    Ok(())
+    rt.block_on(_test_github_retrieve(token))
 }

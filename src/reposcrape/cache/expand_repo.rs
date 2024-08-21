@@ -13,14 +13,14 @@ pub struct ExpandedRepoCache {
     pub projects: BTreeMap<String, Project>,
 }
 
-impl From<RepoScrapeCache> for ExpandedRepoCache {
-    fn from(value: RepoScrapeCache) -> Self {
-        Self::new(value)
-    }
-}
+// impl From<RepoScrapeCache> for ExpandedRepoCache {
+//     fn from(value: RepoScrapeCache) -> Self {
+//         Self::new(value)
+//     }
+// }
 
 impl ExpandedRepoCache {
-    pub fn new(mut cache: RepoScrapeCache) -> ExpandedRepoCache {
+    pub async fn new(mut cache: RepoScrapeCache) -> ExpandedRepoCache {
         let mut expanded = ExpandedRepoCache::default();
 
         if cache.is_empty() {
@@ -90,7 +90,7 @@ impl ExpandedRepoCache {
             expanded.projects.insert(project_name.to_owned(), project);
         }
 
-        let client = reqwest::blocking::Client::new();
+        let client = reqwest::Client::new();
 
         for project in expanded.projects.values() {
             let Some(repo) = &project.repo_main else {
@@ -115,13 +115,13 @@ impl ExpandedRepoCache {
             let mut repo_urls = Vec::new();
 
             for repo in &project.repo_sub {
-                if let Ok(resp) = client.get(&repo.url).send() {
+                if let Ok(resp) = client.get(&repo.url).send().await {
                     repo_urls.push(resp.url().to_owned());
                 }
             }
 
             for child_url in extracted_urls {
-                if let Ok(resp) = client.get(child_url).send() {
+                if let Ok(resp) = client.get(child_url).send().await {
                     let final_url = resp.url();
                     if !repo_urls.contains(final_url) {
                         warn!(
