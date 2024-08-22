@@ -70,7 +70,7 @@ impl Metadata {
                         .name("val")
                         .expect("Failed to get val")
                         .as_str()
-                        .to_uppercase();
+                        .to_string(); // FIXME: Does this need to be uppercase?
                     map.insert(key, val);
                 }
                 // TODO: warn that capture detected but unable to parse
