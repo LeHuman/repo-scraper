@@ -44,7 +44,7 @@ impl Metadata {
             if !URL_KEYWORDS.contains(&k.to_uppercase().as_str()) {
                 continue;
             }
-            let val = match re.captures(&v) {
+            let val = match re.captures(v) {
                 Some(m) => m.name("path").unwrap().as_str().to_string(), // TODO: unwrap
                 None => v.to_string(),
             };
@@ -93,9 +93,7 @@ impl Metadata {
         for line in text.lines() {
             if !keyword_trigger.is_empty() {
                 let keyword = keyword_trigger.to_string();
-                if !map.contains_key(&keyword) {
-                    map.insert(keyword, line.to_string());
-                }
+                map.entry(keyword).or_insert_with(|| line.to_string());
                 keyword_trigger = "";
             }
             let captures = re.captures(line);
