@@ -1,9 +1,8 @@
 use std::collections::{BTreeMap, BTreeSet};
 
-use regex::Regex;
 use tracing::warn;
 
-use crate::reposcrape::{Project, Repo};
+use crate::reposcrape::{metadata::extract_urls, Project, Repo};
 
 use super::repo::RepoScrapeCache;
 
@@ -12,12 +11,6 @@ pub struct ExpandedRepoCache {
     pub repos: BTreeMap<String, Repo>,
     pub projects: BTreeMap<String, Project>,
 }
-
-// impl From<RepoScrapeCache> for ExpandedRepoCache {
-//     fn from(value: RepoScrapeCache) -> Self {
-//         Self::new(value)
-//     }
-// }
 
 impl ExpandedRepoCache {
     pub async fn new(mut cache: RepoScrapeCache) -> ExpandedRepoCache {
@@ -104,7 +97,7 @@ impl ExpandedRepoCache {
             };
 
             // NOTE: Children stored as urls on individual lines, with the way the parser works, it is expected this is a single string containing all of them
-            let extracted_urls = extract_urls(children);
+            let extracted_urls = extract_urls(&children.lines().collect());
             if extracted_urls.len() == project.repo_sub.len() {
                 // TODO: Option to not skip project if count matches?
                 continue;
@@ -114,6 +107,7 @@ impl ExpandedRepoCache {
 
             let mut repo_urls = Vec::new();
 
+            // TODO: check response status?
             for repo in &project.repo_sub {
                 if let Ok(resp) = client.get(&repo.url).send().await {
                     repo_urls.push(resp.url().to_owned());
@@ -124,12 +118,8 @@ impl ExpandedRepoCache {
                 if let Ok(resp) = client.get(child_url).send().await {
                     let final_url = resp.url();
                     if !repo_urls.contains(final_url) {
-                        warn!(
-                            "Requesting URL that did not match in project {}",
-                            &final_url
-                        );
-                        // TODO: Yes
-                        todo!();
+                        warn!("Requesting child URL that was not listed {}", &final_url);
+                        // TODO: Request Repo object from child url 'final_url'
                     }
                 }
             }
@@ -157,17 +147,4 @@ impl ExpandedRepoCache {
 
         expanded
     }
-}
-
-fn extract_urls(input: &str) -> Vec<String> {
-    let url_pattern = r"(http(s)?://.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)";
-    let re = Regex::new(url_pattern).unwrap();
-    let mut urls = Vec::new();
-
-    for line in input.lines() {
-        for mat in re.find_iter(line) {
-            urls.push(mat.as_str().to_string());
-        }
-    }
-    urls
 }

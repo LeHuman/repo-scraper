@@ -21,6 +21,8 @@ pub struct RepoDetails {
     pub children: Option<String>, // NOTE: Only relevant if this is a main repository for a project, ignored otherwise
     pub status: Option<String>,
     pub description: Option<String>,
+    pub logo: Option<String>,
+    pub highlight: Option<String>,
 }
 
 impl RepoDetails {
@@ -79,6 +81,7 @@ pub struct Repo {
     pub name: String,
     pub owner: String,
     pub origin: String,
+    pub raw_url: String,
     pub last_sync: EpochType,
     pub last_update: EpochType,
     pub details: Option<RepoDetails>,
@@ -117,6 +120,7 @@ impl Repo {
         name: String,
         owner: String,
         origin: String,
+        raw_url: String,
         last_sync: EpochType,
         last_update: EpochType,
         metadata: &HashMap<String, String>,
@@ -140,6 +144,7 @@ impl Repo {
             name,
             owner,
             origin,
+            raw_url,
             last_sync,
             last_update,
             details: if update { Some(details) } else { None },

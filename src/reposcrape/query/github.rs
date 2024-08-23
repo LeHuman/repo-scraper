@@ -17,6 +17,7 @@ pub struct GHQuery {
 }
 
 pub const ORIGIN: &str = "GitHub";
+pub const RAW_URL: &str = "https://raw.githubusercontent.com/{user}/{repo}/{branch}/";
 
 impl GHQuery {
     pub fn new(instance: Octocrab) -> Self {
@@ -57,14 +58,26 @@ impl GHQuery {
             }
         };
         let owner = repo_val["owner"].as_object()?["login"].as_str()?.to_owned();
+        let branch = repo_val["defaultBranchRef"].as_object()?["name"]
+            .as_str()?
+            .to_owned();
         let readme_text = repo_val["object"].as_object()?["text"].as_str()?; // NOTE: fn ignores repositories with no README.md
-        let metadata = Metadata::extract(readme_text);
+        let mut metadata = Metadata::extract(readme_text);
+
+        let mut raw_url = RAW_URL.to_owned();
+        raw_url = raw_url.replace("{user}", &owner);
+        raw_url = raw_url.replace("{repo}", &name);
+        raw_url = raw_url.replace("{branch}", &branch);
+
+        Metadata::resolve_meta_urls(&raw_url, &mut metadata).await;
+
         Some(Repo::new(
             id,
             url,
             name,
             owner,
             ORIGIN.to_owned(),
+            raw_url,
             today_epoch,
             updated_at,
             &metadata,
@@ -134,6 +147,9 @@ fn qstr_single(username: &str, repository: &str) -> String {
                 name
                 updatedAt
                 owner{{login}}
+                defaultBranchRef {{
+                    name
+                }}
                 object(expression: "HEAD:README.md") {{
                     ... on Blob {{
                         text
@@ -155,6 +171,9 @@ fn qstr_latest(username: &str, max_count: u32) -> String {
                 name
                 updatedAt
                 owner{{login}}
+                defaultBranchRef {{
+                    name
+                }}
                 object(expression: "HEAD:README.md") {{
                     ... on Blob {{
                         text
@@ -185,6 +204,9 @@ search(type: REPOSITORY, first: {max_count}, query: "user:{username} pushed:>{lo
         name
         updatedAt
         owner{{login}}
+        defaultBranchRef {{
+            name
+        }}
         object(expression: "HEAD:README.md") {{
         ... on Blob {{
             text

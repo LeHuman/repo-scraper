@@ -19,6 +19,7 @@ pub fn test_expand_cache() -> Result<(), Box<dyn std::error::Error>> {
         name: "Repo0".into(),
         owner: "Username0".into(),
         origin: "github".into(),
+        raw_url: "".into(),
         last_sync: Epoch::from_rfc3339("2019-05-14T19:19:26Z")?,
         last_update: Epoch::from_rfc3339("2018-05-14T19:19:26Z")?,
         details: Some(RepoDetails {
@@ -33,6 +34,8 @@ pub fn test_expand_cache() -> Result<(), Box<dyn std::error::Error>> {
             status: Some("Work In Progress".into()),
             main: Some("".into()),
             children: None,
+            logo: None,
+            highlight: None,
         }),
     });
     repos.insert(Repo {
@@ -42,6 +45,7 @@ pub fn test_expand_cache() -> Result<(), Box<dyn std::error::Error>> {
         name: "Repo1".into(),
         owner: "Username1".into(),
         origin: "github".into(),
+        raw_url: "".into(),
         last_sync: Epoch::from_rfc3339("2021-06-14T08:19:26Z")?,
         last_update: Epoch::from_rfc3339("2020-05-14T08:19:26Z")?,
         details: Some(RepoDetails {
@@ -56,6 +60,8 @@ pub fn test_expand_cache() -> Result<(), Box<dyn std::error::Error>> {
             status: Some("Archive".into()),
             main: Some("this".into()),
             children: None,
+            logo: None,
+            highlight: None,
         }),
     });
     repos.insert(Repo {
@@ -65,6 +71,7 @@ pub fn test_expand_cache() -> Result<(), Box<dyn std::error::Error>> {
         name: "Repo2".into(),
         owner: "Username0".into(),
         origin: "github".into(),
+        raw_url: "".into(),
         last_sync: Epoch::from_rfc3339("2021-06-14T08:19:26Z")?,
         last_update: Epoch::from_rfc3339("2020-10-12T08:19:26Z")?,
         details: Some(RepoDetails {
@@ -79,6 +86,8 @@ pub fn test_expand_cache() -> Result<(), Box<dyn std::error::Error>> {
             status: Some("Work In Progress".into()),
             main: None,
             children: None,
+            logo: None,
+            highlight: None,
         }),
     });
 
